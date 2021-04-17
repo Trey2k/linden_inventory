@@ -31,8 +31,9 @@ inform = function(msg)
 end
 
 StartInventory = function()
-	playerID, playerPed, invOpen, isDead, isCuffed, isBusy, usingWeapon, weight, currentDrop = nil, nil, false, false, false, false, false, Config.PlayerWeight, nil
+	playerID, playerPed, invOpen, isDead, isCuffed, isBusy, usingWeapon, currentDrop = nil, nil, false, false, false, false, false, nil
 	ESX.TriggerServerCallback('linden_inventory:setup',function(data)
+		ESX.SetPlayerData('inventory', data.inventory)
 		ESX.PlayerData = ESX.GetPlayerData()
 		playerPed = PlayerPedId()
 		playerCoords = GetEntityCoords(playerPed)
@@ -135,7 +136,7 @@ end
 
 OpenStash = function(data)
 	if not invOpen and CanOpenInventory() and not CanOpenTarget(playerPed) then
-		TriggerServerEvent('linden_inventory:openInventory', {type = 'stash', id = data.name, slots = data.slots, coords = data.coords, job = data.job  })
+		TriggerServerEvent('linden_inventory:openInventory', {type = 'stash', id = data.name, owner = data.owner, slots = data.slots, coords = data.coords, job = data.job  })
 	end
 end
 exports('OpenStash', OpenStash)
@@ -165,6 +166,15 @@ CloseVehicle = function(veh)
 	SetVehicleDoorShut(veh, open, false)
 	CloseToVehicle = false
 	lastVehicle = nil
+end
+
+WeightActions = function(current, max)
+	local difference = max - current
+	if current > (max-5000) then
+		--
+	else
+		--
+	end
 end
 
 local nui_focus = {false, false}
@@ -215,9 +225,11 @@ AddEventHandler('linden_inventory:openInventory',function(data, rightinventory)
 		inventory = data.inventory,
 		slots = data.slots,
 		name = inventoryLabel,
-		maxweight = data.maxWeight,
+		maxWeight = data.maxWeight,
+		weight = data.weight,
 		rightinventory = rightinventory
 	})
+	ESX.PlayerData.inventory = data.inventory
 	if not rightinventory then movement = true else movement = false end
 	SetNuiFocusAdvanced(true, true, movement)
 	currentInventory = rightinventory
@@ -230,14 +242,41 @@ AddEventHandler('linden_inventory:refreshInventory', function(data)
 		inventory = data.inventory,
 		slots = data.slots,
 		name = inventoryLabel,
-		maxweight = data.maxWeight
+		maxWeight = data.maxWeight,
+		weight = data.weight
 	})
+	ESX.PlayerData.inventory = data.inventory
+	ESX.SetPlayerData('inventory', data.inventory)
 end)
 
 RegisterNetEvent('linden_inventory:itemNotify')
-AddEventHandler('linden_inventory:itemNotify', function(item, text, weapon)
-	SendNUIMessage({ message = 'notify', item = item, text = text })
-	if weapon then TriggerEvent('linden_inventory:checkWeapon', weapon) end
+AddEventHandler('linden_inventory:itemNotify', function(item, count, slot, notify)
+	if count > 0 then notification = ('%s %sx'):format(notify, count)
+	else notification = 'Used' end
+	if type(slot) == 'table' then
+		for k,v in pairs(slot) do
+			ESX.PlayerData.inventory[k] = item
+			if notify == 'Removed' and ESX.PlayerData.inventory[k].count then
+				local count = ESX.PlayerData.inventory[k].count - v
+				ESX.PlayerData.inventory[k].count = count
+				if item.name:find('WEAPON_') then TriggerEvent('linden_inventory:checkWeapon', item) end
+			end
+		end
+	else
+		ESX.PlayerData.inventory[slot] = item
+		if notify == 'Removed' then
+			local count = ESX.PlayerData.inventory[slot].count - count
+			ESX.PlayerData.inventory[slot].count = count
+			if item.name:find('WEAPON_') then TriggerEvent('linden_inventory:checkWeapon', item) end
+		end
+	end
+	ESX.SetPlayerData('inventory', ESX.PlayerData.inventory)
+	SendNUIMessage({ message = 'notify', item = item, text = notification })
+end)
+
+RegisterNetEvent('linden_inventory:updateStorage')
+AddEventHandler('linden_inventory:updateStorage', function(data)
+	if Config.WeightActions then WeightActions(data[1], data[2]) end
 end)
 
 RegisterNetEvent('linden_inventory:createDrop')
@@ -335,8 +374,8 @@ AddEventHandler('linden_inventory:currentWeapon', function(weapon)
 end)
 
 RegisterNetEvent('linden_inventory:checkWeapon')
-AddEventHandler('linden_inventory:checkWeapon', function(data)
-	if currentWeapon and currentWeapon.metadata.serial == data then
+AddEventHandler('linden_inventory:checkWeapon', function(item)
+	if currentWeapon and currentWeapon.metadata.serial == item.metadata.serial then
 		DisarmPlayer()
 	end
 end)
@@ -397,7 +436,7 @@ TriggerLoops = function()
 		local Disable = {37, 157, 158, 160, 164, 165, 289}
 		local wait = false
 		while PlayerLoaded do
-			sleep = 3
+			sleep = 5
 			for i=1, #Disable, 1 do
 				DisableControlAction(0, Disable[i], true)
 			end
@@ -716,6 +755,18 @@ RegisterCommand('vehinv', function()
 		end
 	end
 end)
+
+RegisterCommand('hotbar', function()
+	local data = {}
+	for i=1, 5 do
+		if ESX.PlayerData.inventory[i] then data[i] = ESX.PlayerData.inventory[i] end
+	end
+	SendNUIMessage({
+		message = 'hotbar',
+		items = data
+	})
+end)
+RegisterKeyMapping('hotbar', 'Open vehicle inventory', 'keyboard', 'tab')
 		
 RegisterKeyMapping('inv', 'Open player inventory', 'keyboard', Config.InventoryKey)
 RegisterKeyMapping('vehinv', 'Open vehicle inventory', 'keyboard', Config.VehicleInventoryKey)

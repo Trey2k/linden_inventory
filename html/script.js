@@ -7,11 +7,12 @@ var righttotalkg = 0
 var count = 0
 var dropSlots = 50
 var timer = null
+var showhotbar = null
 var HSN = []
 var rightinvtype = null
 var rightinventory = null
-var maxweight = 30000
-var rightmaxweight = 30000
+var maxWeight = 30000
+var rightmaxWeight = 30000
 var playerfreeweight = 0
 var rightfreeweight = 0
 var availableweight = 0
@@ -70,19 +71,20 @@ var numberFormat = function(num, item) {
 
 Display = function(bool) {
 	if (bool) {
-		$(".inventory-main").fadeIn(300);
+		$(".inventory-main").fadeIn(200);
 		$('.inventory-main').show()
 	} else {
-		$(".inventory-main").fadeOut(300);
-		$('.inventory-main').hide()
-		$(".item-slot").css("border", "1px solid rgba(255, 255, 255, 0.1)");
-		$(".item-slot").remove();
-		$(".ItemBoxes").remove();
-		$(".inventory-main-leftside").find(".item-slot").remove();
-		$('.inventory-main-rightside').removeData("invId")
-		$(".rightside-weight").html('')
-		righttotalkg = 0
-		totalkg = 0
+		setTimeout(function() {
+			var $inventory = $(".inventory-main");
+			$.when($inventory.fadeOut(200)).done(function() {
+				$(".item-slot").remove();
+				$(".ItemBoxes").remove();
+				$('.inventory-main').hide()
+				$('.inventory-main-rightside').removeData("invId")
+				righttotalkg = 0
+				totalkg = 0
+			});
+		});
 	}
 }
 element.__defineGetter__("id", function() {
@@ -99,19 +101,37 @@ window.addEventListener('message', function(event) {
 		DragAndDrop()
 	} else if (event.data.message == 'close') {
 		HSN.CloseInventory()
-
 	} else if (event.data.message == 'refresh') {
 		HSN.RefreshInventory(event.data)
 		DragAndDrop()
-	} else if (event.data.message == 'hsn-hotbar') {
-		//HSN.Hotbar(event.data.items) 
+	} else if (event.data.message == 'hotbar') {
+		HSN.Hotbar(event.data.items) 
 	}else if (event.data.message == "notify") {
 		HSN.NotifyItems(event.data.item,event.data.text)
 	}
 })
 
-HSN.Hotbar = function(hotbar) {
-	
+HSN.Hotbar = function(items) {
+	if (showhotbar == null) {
+		showhotbar = true
+		var $hotbar = $(".hotbar-container")
+		$hotbar.fadeIn(200);
+		for(i = 0; i < 5; i++) {
+			var $hotslot = $(".hotslot-container.template").clone();
+			$hotslot.removeClass('template');
+			var item = items[i]
+			if (item != null) {
+				$hotslot.html('<div id="itembox-label"><p>'+item.label+'</p></div><div class="hotslot-img"><img src="images/' + item.name + '.png'+'" alt="' + item.name + '" /></div>');
+			}
+			$hotslot.appendTo($(".hotbar-container"));
+		}
+		setTimeout(function() {
+			$.when($hotbar.fadeOut(300)).done(function() {
+				$hotbar.html('')
+				showhotbar = null
+			});
+		}, 3000);
+	}
 }
 
 HSN.NotifyItems = function(item, text) {
@@ -194,7 +214,7 @@ HSN.RemoveItemFromSlot = function(inventory,slot) {
 
 
 HSN.SetupInventory = function(data) {
-	maxweight = data.maxweight
+	maxWeight = data.maxWeight
 	$('.playername').html(data.name)
 	for(i = 1; i <= (data.slots); i++) {
 		$(".inventory-main-leftside").find("[inventory-slot=" + i + "]").remove();
@@ -224,7 +244,7 @@ HSN.SetupInventory = function(data) {
 	})
 
 
-	$(".leftside-weight").html(weightFormat(totalkg/1000, false, true) + '/'+ weightFormat(maxweight/1000, false))
+	$(".leftside-weight").html(weightFormat(totalkg/1000, false, true) + '/'+ weightFormat(maxWeight/1000, false))
 	if (data.rightinventory !== undefined) {
 		$('.inventory-main-rightside').data("invTier", data.rightinventory.type)
 		$('.inventory-main-rightside').data("invId", data.rightinventory.name)
@@ -232,10 +252,10 @@ HSN.SetupInventory = function(data) {
 		rightinvtype = data.rightinventory.type
 		
 		if (rightinvtype == 'TargetPlayer') {
-			rightmaxweight = data.rightinventory.maxWeight
+			rightmaxWeight = data.rightinventory.maxWeight
 			righttotalkg = data.rightinventory.weight
 		} else {
-			rightmaxweight = data.rightinventory.maxWeight || (data.rightinventory.slots*8000).toFixed(0)
+			rightmaxWeight = data.rightinventory.maxWeight || (data.rightinventory.slots*8000).toFixed(0)
 			righttotalkg = 0
 		}
 		$('.rightside-name').html(data.rightinventory.name)
@@ -288,13 +308,13 @@ HSN.SetupInventory = function(data) {
 					}
 				}
 			})
-			$(".rightside-weight").html(weightFormat(righttotalkg/1000, false, true) + '/'+ weightFormat(rightmaxweight/1000, false))
+			$(".rightside-weight").html(weightFormat(righttotalkg/1000, false, true) + '/'+ weightFormat(rightmaxWeight/1000, false))
 		}
 	} else {
 		$('.rightside-name').html("Drop")
 		$('.inventory-main-rightside').data("invTier", "drop")
 		rightinvtype = 'drop'
-		rightmaxweight = (dropSlots*9000).toFixed(0)
+		rightmaxWeight = (dropSlots*9000).toFixed(0)
 		righttotalkg = 0
 		for(i = 1; i <= (dropSlots); i++) {
 			$(".inventory-main-rightside").find("[inventory-slot=" + i + "]").remove();
@@ -307,15 +327,15 @@ HSN.SetupInventory = function(data) {
 function DragAndDrop() {
 	$(".drag-item").draggable({
 		helper: 'clone',
-		appendTo: "body",
-		scroll: true,
+		appendTo: ".inventory-main",
 		revertDuration: 0,
 		revert: "invalid",
 		cancel: ".itemdragclose",
+		containment: "body",
 		start: function(event, ui) {
 			IsDragging = true;
 			$(this).find("img").css("filter", "brightness(50%)");
-			count = parseInt($("#item-count").val());
+			count = $("#item-count").val();
 		},
 		stop: function() {
 			setTimeout(function(){
@@ -333,39 +353,40 @@ function DragAndDrop() {
 			}, 300)
 			curslot = ui.draggable.attr("inventory-slot");
 			fromInventory = ui.draggable.parent();
-			var inv = fromInventory.data('invTier')
 			toInventory = $(this).parent()
 			toSlot = $(this).attr("inventory-slot");
 			fromData = fromInventory.find("[inventory-slot=" + curslot + "]").data("ItemData");
-			if (fromData !== undefined && count !== undefined) {
-				if (count == "" || count == 0) {
+			count = parseInt($("#item-count").val()) || 0
+			if (fromData !== undefined) {
+				if (count == 0 || count > fromData.count) {
 					count = fromData.count
+					$("#item-count").val(0)
 				}
 				SwapItems(fromInventory, toInventory, curslot, toSlot)
 			}
 		},
-
-	});
-
-	$(".use").droppable({
-		hoverClass: 'button-hover',
-		drop: function(event, ui) {
-			setTimeout(function(){
-				IsDragging = false;
-			}, 300)
-			fromData = ui.draggable.data("ItemData");
-			fromInventory = ui.draggable.parent();
-			inv = fromInventory.data('invTier')
-				$.post("https://linden_inventory/useItem", JSON.stringify({
-					item: fromData,
-					inv: inv
-				}));
-				if (fromData.closeonuse) {
-					HSN.CloseInventory()
-				}
-		}
+	
 	});
 }
+
+$(".use").droppable({
+	hoverClass: 'button-hover',
+	drop: function(event, ui) {
+		setTimeout(function(){
+			IsDragging = false;
+		}, 300)
+		fromData = ui.draggable.data("ItemData");
+		fromInventory = ui.draggable.parent();
+		inv = fromInventory.data('invTier')
+		$.post("https://linden_inventory/useItem", JSON.stringify({
+			item: fromData,
+			inv: inv
+		}));
+		if (fromData.closeonuse) {
+			HSN.CloseInventory()
+		}
+	}
+});
 
 $(".give").droppable({
 	hoverClass: 'button-hover',
@@ -375,29 +396,31 @@ $(".give").droppable({
 		}, 300)
 		fromData = ui.draggable.data("ItemData");
 		fromInventory = ui.draggable.parent();
-		count = parseInt($("#item-count").val());
+		count = parseInt($("#item-count").val()) || 0
 		inv = fromInventory.data('invTier')
-		if (inv == 'Playerinv' && count > 0 ) {
-			$.post("https://linden_inventory/giveItem", JSON.stringify({
-				item: fromData,
-				inv: inv,
-				amount: count
-			}));
+		if (fromData !== undefined) {
+			if (inv == 'Playerinv' && count >= 0) {
+				$.post("https://linden_inventory/giveItem", JSON.stringify({
+					item: fromData,
+					inv: inv,
+					amount: count
+				}));
+			}
 		}
 	}
 });
 
 $(document).on("click", ".ItemBoxes", function(e){
-	if ($(this).data("location") !== undefined && parseInt($("#item-count").val()) >= 0) {
+	if ($(this).data("location") !== undefined) {
 		e.preventDefault();
 		var Item = $(this).data("ItemData")
 		var location = $(this).data("location")
-		var htmlCount = parseInt($("#item-count").val())
-		if ((Item != undefined) && (location != undefined)) {
+		count = parseInt($("#item-count").val()) || 0
+		if (Item != undefined && count >= 0) {
 			$.post("https://linden_inventory/BuyFromShop", JSON.stringify({
 				data: Item,
 				location: location,
-				count: htmlCount
+				count: count
 			}));
 		}
 	}
@@ -480,8 +503,8 @@ SwapItems = function(fromInventory, toInventory, fromSlot, toSlot) {
 	var fromSlot = Number(fromSlot)
 	var toSlot = Number(toSlot)
 	var success = false
-	playerfreeweight = maxweight - totalkg
-	rightfreeweight = rightmaxweight - righttotalkg
+	playerfreeweight = maxWeight - totalkg
+	rightfreeweight = rightmaxWeight - righttotalkg
 	availableweight = 0
 	//inv = from
 	//inv2 == to
@@ -699,16 +722,16 @@ SwapItems = function(fromInventory, toInventory, fromSlot, toSlot) {
 			if (inv2 !== 'Playerinv') {
 				if (inv2 !== inv) {
 					righttotalkg = righttotalkg + (fromItem.weight * count)
-					$(".rightside-weight").html(weightFormat(righttotalkg/1000, false, true) + '/'+ weightFormat(rightmaxweight/1000, false))
+					$(".rightside-weight").html(weightFormat(righttotalkg/1000, false, true) + '/'+ weightFormat(rightmaxWeight/1000, false))
 					totalkg = totalkg - (fromItem.weight * count)
-					$(".leftside-weight").html(weightFormat(totalkg/1000, false, true) + '/'+ weightFormat(maxweight/1000, false))
+					$(".leftside-weight").html(weightFormat(totalkg/1000, false, true) + '/'+ weightFormat(maxWeight/1000, false))
 				}
 			} else {
 				if (inv2 !== inv) {
 					righttotalkg = righttotalkg - (fromItem.weight * count)
-					$(".rightside-weight").html(weightFormat(righttotalkg/1000, false, true) + '/'+ weightFormat(rightmaxweight/1000, false))
+					$(".rightside-weight").html(weightFormat(righttotalkg/1000, false, true) + '/'+ weightFormat(rightmaxWeight/1000, false))
 					totalkg = totalkg + (fromItem.weight * count)
-					$(".leftside-weight").html(weightFormat(totalkg/1000, false, true) + '/'+ weightFormat(maxweight/1000, false))
+					$(".leftside-weight").html(weightFormat(totalkg/1000, false, true) + '/'+ weightFormat(maxWeight/1000, false))
 				}
 			}
 		} else {

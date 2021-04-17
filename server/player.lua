@@ -1,8 +1,12 @@
+checkPlayer = function(xPlayer)
+	if xPlayer.get('linventory') ~= true then count = 0 while true do count = count + 1 if count == 15 then return false end Citizen.Wait(100) end else return true end
+end
+
 getInventoryItem = function(xPlayer, name, metadata)
+	if checkPlayer(xPlayer) ~= true then return end
 	local xItem = Items[name]
 	if not xItem then print(('^1[error]^7 %s does not exist'):format(name)) return end
 	xItem.count = 0
-	if metadata then metadata = setMetadata(metadata) end
 	for k, v in pairs(Inventories[xPlayer.source].inventory) do
 		if v.name == name then
 			if not v.metadata then v.metadata = {} end
@@ -17,6 +21,7 @@ exports('getInventoryItem', getInventoryItem)
 
 
 addInventoryItem = function(xPlayer, item, count, metadata, slot)
+	if checkPlayer(xPlayer) ~= true then return end
 	local xItem = Items[item]
 	if xPlayer and xItem and count > 0 then
 		if metadata == 'setname' then metadata = {description = xPlayer.getName()} else metadata = setMetadata(metadata) end
@@ -50,7 +55,7 @@ addInventoryItem = function(xPlayer, item, count, metadata, slot)
 			Inventories[xPlayer.source].inventory[slot] = {name = item, label = xItem.label, weight = xItem.weight, slot = slot, count = count, description = xItem.description, metadata = metadata, stackable = xItem.stackable, closeonuse = true}
 			if xItem.ammoType then Inventories[xPlayer.source].inventory[slot].ammoType = xItem.ammoType end
 			if xItem.weight > 0 or xItem.name:find('money') then updateWeight(xPlayer) end
-			ItemNotify(xPlayer, item, count, false, 'Added')
+			ItemNotify(xPlayer, Inventories[xPlayer.source].inventory[slot], count, slot, 'Added')
 		elseif item:find('identification') then
 			count = 1
 			metadata = {}
@@ -60,13 +65,13 @@ addInventoryItem = function(xPlayer, item, count, metadata, slot)
 			if existing then count = Inventories[xPlayer.source].inventory[slot].count + count end
 			Inventories[xPlayer.source].inventory[slot] = {name = item, label = xItem.label, weight = xItem.weight, slot = slot, count = count, description = xItem.description, metadata = metadata, stackable = xItem.stackable, closeonuse = true}
 			if xItem.weight > 0 or xItem.name:find('money') then updateWeight(xPlayer) end
-			ItemNotify(xPlayer, item, added, false, 'Added')
+			ItemNotify(xPlayer, Inventories[xPlayer.source].inventory[slot], added, slot, 'Added')
 		elseif slot then
 			local added = count
 			if existing then count = Inventories[xPlayer.source].inventory[slot].count + count end
-			Inventories[xPlayer.source].inventory[slot] = {name = item, label = xItem.label, weight = xItem.weight, slot = slot, count = count, description = xItem.description, metadata = metadata, stackable = xItem.stackable, closeonuse = xItem.closeonuse}
+			Inventories[xPlayer.source].inventory[slot] = {name = item, label = xItem.label, weight = xItem.weight, slot = slot, count = count, description = xItem.description, metadata = metadata or {}, stackable = xItem.stackable, closeonuse = xItem.closeonuse}
 			if xItem.weight > 0 or xItem.name:find('money') then updateWeight(xPlayer) end
-			ItemNotify(xPlayer, item, added, false, 'Added')
+			ItemNotify(xPlayer, Inventories[xPlayer.source].inventory[slot], added, slot, 'Added')
 		end
 		if slot then TriggerClientEvent('linden_inventory:refreshInventory', xPlayer.source, Inventories[xPlayer.source]) end
 	end
@@ -75,19 +80,20 @@ exports('addInventoryItem', addInventoryItem)
 
 
 removeInventoryItem = function(xPlayer, item, count, metadata, slot)
+	if checkPlayer(xPlayer) ~= true then return end
 	local xItem = Items[item]
 	if xPlayer and xItem and count > 0 then
 		if metadata then metadata = setMetadata(metadata) end
 		if slot and Inventories[xPlayer.source].inventory[slot].count == count and Inventories[xPlayer.source].inventory[slot].name == xItem.name then
+			ItemNotify(xPlayer, Inventories[xPlayer.source].inventory[slot], count, slot, 'Removed')
 			Inventories[xPlayer.source].inventory[slot] = nil
 			if xItem.weight > 0 or xItem.name:find('money') then updateWeight(xPlayer) end
-			ItemNotify(xPlayer, item, count, slot, 'Removed')
 			TriggerClientEvent('linden_inventory:refreshInventory', xPlayer.source, Inventories[xPlayer.source])
 		elseif slot and Inventories[xPlayer.source].inventory[slot].count > count and Inventories[xPlayer.source].inventory[slot].name == xItem.name then
 			local newCount = Inventories[xPlayer.source].inventory[slot].count - count
+			ItemNotify(xPlayer, Inventories[xPlayer.source].inventory[slot], count, slot, 'Removed')
 			Inventories[xPlayer.source].inventory[slot] = {name = item, label = xItem.label, weight = xItem.weight, slot = slot, count = newCount, description = xItem.description, metadata = metadata, stackable = xItem.stackable, closeonuse = xItem.closeonuse}
 			if xItem.weight > 0 or xItem.name:find('money') then updateWeight(xPlayer) end
-			ItemNotify(xPlayer, item, count, slot, 'Removed')
 			TriggerClientEvent('linden_inventory:refreshInventory', xPlayer.source, Inventories[xPlayer.source])
 		else
 			local itemSlots, totalCount = getInventoryItemSlots(xPlayer, item, metadata)
@@ -111,7 +117,7 @@ removeInventoryItem = function(xPlayer, item, count, metadata, slot)
 					end
 				end
 				if xItem.weight > 0 or xItem.name:find('money') then updateWeight(xPlayer) end
-				ItemNotify(xPlayer, item, removed, false, 'Removed')
+				ItemNotify(xPlayer, xItem, removed, itemSlots, 'Removed')
 				TriggerClientEvent('linden_inventory:refreshInventory', xPlayer.source, Inventories[xPlayer.source])
 			end
 		end
@@ -121,6 +127,7 @@ exports('removeInventoryItem', removeInventoryItem)
 
 
 setInventoryItem = function(xPlayer, name, count, metadata)
+	if checkPlayer(xPlayer) ~= true then return end
 	local item = getInventoryItem(xPlayer, name, metadata)
 	if item and count >= 0 then
 		count = ESX.Math.Round(count)
@@ -136,8 +143,12 @@ end
 exports('setInventoryItem', setInventoryItem)
 
 
-updateWeight = function(xPlayer)
-	Inventories[xPlayer.source].weight = getWeight(xPlayer)
+updateWeight = function(xPlayer, force)
+	local newWeight = getWeight(xPlayer)
+	if force or newWeight ~= Inventories[xPlayer.source].weight then
+		Inventories[xPlayer.source].weight = newWeight
+		TriggerClientEvent('linden_inventory:updateStorage', xPlayer.source, {newWeight, Inventories[xPlayer.source].maxWeight, Inventories[xPlayer.source].slots})
+	end
 	SyncAccounts(xPlayer, 'money')
 	SyncAccounts(xPlayer, 'black_money')
 end
@@ -169,6 +180,7 @@ exports('setMaxWeight', setMaxWeight)
 
 
 canCarryItem = function(xPlayer, name, count, metadata)
+	if checkPlayer(xPlayer) ~= true then return end
 	local xItem = Items[name]
 	if xItem then
 		local freeSlot = false
@@ -187,6 +199,7 @@ exports('canCarryItem', canCarryItem)
 
 
 canSwapItem = function(xPlayer, firstItem, firstItemCount, testItem, testItemCount)
+	if checkPlayer(xPlayer) ~= true then return end
 	local curWeight = Inventories[xPlayer.source].weight
 	local firstItemObject = getInventoryItem(xPlayer, firstItem)
 	local testItemObject = getInventoryItem(xPlayer, testItem)
@@ -201,24 +214,27 @@ exports('canSwapItem', canSwapItem)
 
 
 getPlayerInventory = function(xPlayer, minimal)
-	local inventory = {}
-	for k, v in pairs(Inventories[xPlayer.source].inventory) do
-		if v.count > 0 then
-			if minimal and v.metadata and next(v.metadata) == nil then v.metadata = nil end
-			inventory[#inventory+1] = {
-				name = v.name,
-				count = v.count,
-				slot = k,
-				metadata = v.metadata
-			}
+	if Inventories[xPlayer.source] then
+		local inventory = {}
+		for k, v in pairs(Inventories[xPlayer.source].inventory) do
+			if v.count > 0 then
+				if minimal and v.metadata and next(v.metadata) == nil then v.metadata = nil end
+				inventory[#inventory+1] = {
+					name = v.name,
+					count = v.count,
+					slot = k,
+					metadata = v.metadata
+				}
+			end
 		end
+		return inventory
 	end
-	return inventory
 end
 exports('getPlayerInventory', getPlayerInventory)
 
 
 getPlayerSlot = function(xPlayer, slot, item, metadata)
+	while xPlayer.get('linventory') ~= true do Citizen.Wait(100) print(xPlayer.get('linventory')) end
 	if slot > Config.PlayerSlots then return nil end
 	local getSlot = Inventories[xPlayer.source].inventory[slot]
 	if item and getSlot and getSlot.name ~= item then slot = nil end
@@ -229,6 +245,7 @@ exports('getPlayerSlot', getPlayerSlot)
 
 
 getInventoryItemSlots = function(xPlayer, name, metadata)
+	while xPlayer.get('linventory') ~= true do Citizen.Wait(100) print(xPlayer.get('linventory')) end
 	local xItem = Items[name]
 	if not xItem then print(('^1[error]^7 %s does not exist'):format(name)) return end
 	local totalCount, slots, emptySlots = 0, {}, Config.PlayerSlots

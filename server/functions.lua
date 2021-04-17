@@ -1,3 +1,10 @@
+GetPlayerIdentification = function(xPlayer)
+	local sex, identifier = xPlayer.get('sex')
+	if sex == 'm' then sex = 'Male' elseif sex == 'f' then sex = 'Female' end
+	if Config.ShowIdentifierID then identifier = ' ('..xPlayer.getIdentifier()..')' else identifier = '' end
+	return ('Sex: %s | DOB: %s%s'):format( sex, xPlayer.get('dateofbirth'), identifier )
+end
+
 PlayerDropped = function(src)
 	local data = Opened[src]
 	if data then
@@ -13,6 +20,7 @@ PlayerDropped = function(src)
 			print(src..' disconnected while accessing '..data.type..' '..data.invid)
 		end
 		Opened[src] = nil
+		Inventories[src] = nil
 		if data.invid then Opened[data.invid] = nil end
 	end
 end
@@ -65,7 +73,7 @@ end
 
 setMetadata = function(metadata)
 	local data = metadata
-	if data == nil then return {}
+	if data == nil then data = {}
 	elseif type(data) == 'string' then return { type = data } end
 	return data
 end
@@ -108,25 +116,16 @@ ValidateItem = function(type, xPlayer, fromSlot, toSlot, fromItem, toItem)
 	if reason then
 		print( ('[%s] %s failed item validation (type: %s, fromSlot: %s, toSlot: %s, fromItem: %s, toItem: %s, reason: %s)'):format(xPlayer.source, GetPlayerName(xPlayer.source), type, fromSlot, toSlot, fromItem, toItem, reason) )
 		-- failed validation can be caused by desync, so don't autoban for it
+		TriggerClientEvent('mythic_notify:client:SendAlert', xPlayer.source, { type = 'error', text = '(Desync) '..reason })
 		TriggerClientEvent("linden_inventory:closeInventory", xPlayer.source)
 		TriggerClientEvent('linden_inventory:refreshInventory', xPlayer.source, Inventories[xPlayer.source])
 		return false
 	else return true end
 end 
 
-ItemNotify = function(xPlayer, item, count, slot, type, invid)
-	local xItem = Items[item]
-	local notification
-	if count > 0 then
-		notification = ('%s %sx'):format(type, count)
-		if Config.Logs then
-			-- todo
-		end
-	else notification = 'Used' end
-	if slot and type == 'Removed' and item:find('WEAPON_') then
-		slot = Inventories[xPlayer.source].inventory[slot].metadata.serial
-	else slot = nil end
-	TriggerClientEvent('linden_inventory:itemNotify', xPlayer.source, xItem, notification, slot)
+ItemNotify = function(xPlayer, item, count, slot, type)
+	local player = Inventories[xPlayer.source]
+	if Items[item.name] then TriggerClientEvent('linden_inventory:itemNotify', xPlayer.source, item, count, slot, type) end
 end
 
 SyncAccounts = function(xPlayer, name)
@@ -147,28 +146,28 @@ CreateNewDrop = function(xPlayer, data)
 		slots = Config.PlayerSlots,
 		coords = playerCoords
 	}
-	if data.type == 'swap' then
-		if ValidateItem(data.type, xPlayer, Inventories[invid2].inventory[data.fromSlot], Drops[invid].inventory[data.toSlot], data.fromItem, data.toItem) == true then
-			ItemNotify(xPlayer, data.toItem.name, data.toItem.count, data.toItem.slot, 'Removed', invid)
-			ItemNotify(xPlayer, data.fromItem.name, data.fromItem.count, false, 'Added', invid)
-			Drops[invid].inventory[data.toSlot] = {name = data.toItem.name, label = data.toItem.label, weight = data.toItem.weight, slot = data.toSlot, count = data.toItem.count, description = data.toItem.description, metadata = data.toItem.metadata, stackable = data.toItem.stackable, closeonuse = Items[data.toItem.name].closeonuse}
-			Inventories[invid2].inventory[data.fromSlot] = {name = data.fromItem.name, label = data.fromItem.label, weight = data.fromItem.weight, slot = data.fromSlot, count = data.fromItem.count, description = data.fromItem.description, metadata = data.fromItem.metadata, stackable = data.fromItem.stackable, closeonuse = Items[data.fromItem.name].closeonuse}
-		end
-	elseif data.type == 'freeslot' then
+	if data.type == 'freeslot' then
 		if ValidateItem(data.type, xPlayer, Inventories[invid2].inventory[data.emptyslot], Drops[invid].inventory[data.toSlot], data.item, data.item) == true then
 			local count = Inventories[invid2].inventory[data.emptyslot].count
-			ItemNotify(xPlayer, data.item.name, count, data.item.slot, 'Removed', invid)
+			ItemNotify(xPlayer, data.item, count, data.emptyslot, 'Removed')
 			Inventories[invid2].inventory[data.emptyslot] = nil
 			Drops[invid].inventory[data.toSlot] = {name = data.item.name, label = data.item.label, weight = data.item.weight, slot = data.toSlot, count = data.item.count, description = data.item.description, metadata = data.item.metadata, stackable = data.item.stackable, closeonuse = Items[data.item.name].closeonuse}
+			if Config.Logs then
+				exports.linden_logs:log(xPlayer, false, 'has dropped '..data.item.count..'x '..data.item.name..' in drop-'..invid, 'items')
+			end
+			TriggerClientEvent('linden_inventory:createDrop', -1, Drops[invid], xPlayer.source)
 		end
 	elseif data.type == 'split' then
 		if ValidateItem(data.type, xPlayer, Inventories[invid2].inventory[data.fromSlot], Drops[invid].inventory[data.toSlot], data.oldslotItem, data.newslotItem) == true then
-			ItemNotify(xPlayer, data.newslotItem.name, data.newslotItem.count, data.newslotItem.slot, 'Removed', invid)
+			ItemNotify(xPlayer, data.newslotItem, data.newslotItem.count, data.fromSlot, 'Removed')
 			Inventories[invid2].inventory[data.fromSlot] = {name = data.oldslotItem.name, label = data.oldslotItem.label, weight = data.oldslotItem.weight, slot = data.fromSlot, count = data.oldslotItem.count, description = data.oldslotItem.description, metadata = data.oldslotItem.metadata, stackable = data.oldslotItem.stackable, closeonuse = Items[data.oldslotItem.name].closeonuse}
 			Drops[invid].inventory[data.toSlot] = {name = data.newslotItem.name, label = data.newslotItem.label, weight = data.newslotItem.weight, slot = data.toSlot, count = data.newslotItem.count, description = data.newslotItem.description, metadata = data.newslotItem.metadata, stackable = data.newslotItem.stackable, closeonuse = Items[data.newslotItem.name].closeonuse}
+			if Config.Logs then
+				exports.linden_logs:log(xPlayer, false, 'has dropped '..data.newslotItem.count..'x '..data.newslotItem.name,' in drop-'..invid, 'items')
+			end
+			TriggerClientEvent('linden_inventory:createDrop', -1, Drops[invid], xPlayer.source)
 		end
 	end
-	TriggerClientEvent('linden_inventory:createDrop', -1, Drops[invid], xPlayer.source)
 end
 
 local randomPrice = function(price)
@@ -201,33 +200,62 @@ SetupShopItems = function(shop)
 	return inventory
 end
 
-SaveItems = function(type,id)
-	if id and (type == 'stash' or type == 'trunk' or type == 'glovebox') then
+SaveItems = function(type,id,owner)
+	if id and owner == nil and (type == 'stash' or type == 'trunk' or type == 'glovebox') then
 		local inventory = json.encode(getInventory(Inventories[id]))
-		local result = exports.ghmattimysql:scalarSync('SELECT data FROM linden_inventory WHERE name = @name', {
+		exports.ghmattimysql:scalar('SELECT data FROM linden_inventory WHERE name = @name', {
 			['@name'] = id
+		}, function(result)
+			if result then
+				if result ~= inventory then
+					exports.ghmattimysql:execute('UPDATE linden_inventory SET data = @data WHERE name = @name', {
+						['@data'] = inventory,
+						['@name'] = id
+					})
+				end
+			elseif inventory ~= '[]' then
+				exports.ghmattimysql:execute('INSERT INTO linden_inventory (name, data) VALUES (@name, @data)', {
+					['@name'] = id,
+					['@data'] = inventory
+				})
+			end
+		end)
+	elseif id and owner then
+		local inventory = json.encode(getInventory(Inventories[id]))
+		local result = exports.ghmattimysql:executeSync('SELECT * FROM linden_inventory WHERE name = @name AND owner = @owner LIMIT 1', {
+			['@name'] = id,
+			['@owner'] = owner
 		})
-		if result then
-			if result ~= inventory then
-				exports.ghmattimysql:execute('UPDATE linden_inventory SET data = @data WHERE name = @name', {
+		if result[1] then
+			if result[1].data ~= inventory then
+				exports.ghmattimysql:execute('UPDATE linden_inventory SET data = @data WHERE id = @id', {
+					['@id'] = result[1].id,
 					['@data'] = inventory,
-					['@name'] = id
 				})
 			end
 		elseif inventory ~= '[]' then
-			exports.ghmattimysql:execute('INSERT INTO linden_inventory (name, data) VALUES (@name, @data)', {
+			exports.ghmattimysql:execute('INSERT INTO linden_inventory (name, data, owner) VALUES (@name, @data, @owner)', {
 				['@name'] = id,
-				['@data'] = inventory
+				['@data'] = inventory,
+				['@owner'] = owner
 			})
 		end
 	end
 end
 
-GetItems = function(id)
+GetItems = function(id, owner)
 	local returnData = {}
-	local result = exports.ghmattimysql:scalarSync('SELECT data FROM linden_inventory WHERE name = @name', {
-		['@name'] = id
-	})
+	local result
+	if not owner then
+		result = exports.ghmattimysql:scalarSync('SELECT data FROM linden_inventory WHERE name = @name', {
+			['@name'] = id
+		})
+	else
+		result = exports.ghmattimysql:scalarSync('SELECT data FROM linden_inventory WHERE name = @name AND owner = @owner', {
+			['@name'] = id,
+			['@owner'] = owner
+		})
+	end
 	if result ~= nil then
 		local Inventory = json.decode(result)
 		for k,v in pairs(Inventory) do
@@ -248,10 +276,6 @@ CheckOpenable = function(xPlayer, id, coords)
 		return true
 	end
 	return false
-end
-
-GetPlayerIdentification = function(xPlayer)
-	return ('Sex: %s | DOB: %s (%s)'):format( xPlayer.get('sex'), xPlayer.get('dateofbirth'), xPlayer.getIdentifier() )
 end
 
 ValidateString = function(item)
