@@ -33,6 +33,16 @@ Config.YouTool = {
 	}
 }
 
+Config.Nail = {
+	blip = {
+		id = 402,
+		colour = 69,
+		scale = 0.6
+	}, inventory = {
+		{ name = 'lockpick', price = 10 },
+	}
+}
+
 Config.Ammunation = {
 	blip = {
 		id = 110,
@@ -94,7 +104,8 @@ Config.Shops = {
 	{ type = Config.Liquor, coords = vector3(-1393.409, -606.624, 30.319), name = 'Rob\'s Liquor' },
 
 	{ type = Config.YouTool, coords = vector3(2748.0, 3473.0, 55.67), name = 'YouTool' },
-	{ type = Config.YouTool, coords = vector3(342.99, -1298.26, 32.51), name = 'YouTool' },
+	{ type = Config.YouTool, coords = vector3(342.99, -1298.26, 32.51), name = 'YouTool' }, 
+	{ type = Config.Nail, coords = vector3(225.12, -1544.4, 29.29), name = 'Nail Salon' }, 
 
 	{ coords = vector3(-531.14, -1221.33, 18.48), name = 'Xero Gas'},
 	{ coords = vector3(2557.458,  382.282, 108.622), name = '24/7'},
