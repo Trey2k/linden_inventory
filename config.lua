@@ -14,7 +14,7 @@ Config.PlayerWeight = 30000
 Config.EnableBlur = true
 
 -- Requires esx_licenses
-Config.WeaponsLicense = true
+Config.WeaponsLicense = false
 Config.WeaponsLicensePrice = 5000
 
 -- Set the name of your logging resource, or false to disable
@@ -22,10 +22,10 @@ Config.Logs = false --'linden_logs'
 
 -- Default keymapping for the inventory; players can assign their own
 Config.InventoryKey = 'F2'
-Config.VehicleInventoryKey = 'K'
+Config.VehicleInventoryKey = 'Y'
 
 -- Reload empty weapons automatically
-Config.AutoReload = false
+Config.AutoReload = true
 
 -- Randomise the price of items in each shop at resource start
 Config.RandomPrices = false
