@@ -99,7 +99,7 @@ ESX.RegisterServerCallback('linden_inventory:setup', function(source, cb)
 	local xPlayer = ESX.GetPlayerFromId(src)
 	if xPlayer.get('linventory') ~= true then
 		local result = exports.ghmattimysql:scalarSync('SELECT inventory FROM users WHERE identifier = @identifier', {
-			['@identifier'] = xPlayer.identifier
+			['@identifier'] = xPlayer.getIdentifier()
 		})
 		if result ~= nil then
 			TriggerEvent('linden_inventory:setPlayerInventory', xPlayer, json.decode(result))
@@ -137,7 +137,7 @@ AddEventHandler('onResourceStop', function(resourceName)
 		local xPlayers = ESX.GetPlayers()
 		for i=1, #xPlayers, 1 do
 			local xPlayer = ESX.GetPlayerFromId(xPlayers[i])
-			local identifier = xPlayer.identifier
+			local identifier = xPlayer.getIdentifier()
 			local inventory = json.encode(getInventory(Inventories[xPlayer.source]))
 			exports.ghmattimysql:execute('UPDATE `users` SET `inventory` = @inventory WHERE identifier = @identifier', {
 				['@inventory'] = inventory,
@@ -164,6 +164,7 @@ AddEventHandler('linden_inventory:setPlayerInventory', function(xPlayer, data)
 	}
 	if data and next(data) then
 		for k, v in pairs(data) do
+			if type(v) == 'number' then break end
 			local xItem = Items[v.name]
 			if xItem then
 				local weight
@@ -203,10 +204,10 @@ end)
 
 AddEventHandler('linden_inventory:confiscatePlayerInventory', function(xPlayer)
 	if type(xPlayer) ~= 'table' then xPlayer = ESX.GetPlayerFromId(xPlayer) end
-	if xPlayer.identifier then
+	if xPlayer.get('linventory') then
 		local inventory = json.encode(getPlayerInventory(xPlayer))
 		exports.ghmattimysql:execute('REPLACE INTO linden_inventory (name, data) VALUES (@name, @data)', {
-			['@name'] = xPlayer.identifier,
+			['@name'] = xPlayer.getIdentifier(),
 			['@data'] = inventory
 		}, function (rowsChanged)
 			TriggerEvent('linden_inventory:clearPlayerInventory', xPlayer)
@@ -217,10 +218,10 @@ end)
 
 AddEventHandler('linden_inventory:recoverPlayerInventory', function(xPlayer)
 	if type(xPlayer) ~= 'table' then xPlayer = ESX.GetPlayerFromId(xPlayer) end
-	if xPlayer.identifier then
-		local result = exports.ghmattimysql:scalarSync('SELECT data FROM linden_inventory WHERE name = @name', { ['@name'] = xPlayer.identifier })
+	if xPlayer.get('linventory') then
+		local result = exports.ghmattimysql:scalarSync('SELECT data FROM linden_inventory WHERE name = @name', { ['@name'] = xPlayer.getIdentifier() })
 		if result ~= nil then
-			exports.ghmattimysql:execute('DELETE FROM linden_inventory WHERE name = @name', { ['@name'] = xPlayer.identifier })
+			exports.ghmattimysql:execute('DELETE FROM linden_inventory WHERE name = @name', { ['@name'] = xPlayer.getIdentifier() })
 			local Inventory = json.decode(result)
 			for k,v in pairs(Inventory) do
 				if v.metadata == nil then v.metadata = {} end
@@ -271,7 +272,7 @@ AddEventHandler('linden_inventory:openInventory', function(data, player)
 					TriggerClientEvent('linden_inventory:openInventory', xPlayer.source, Inventories[xPlayer.source], Shops[id])
 				end
 			end
-		elseif data.type == 'glovebox' or data.type == 'trunk' or data.type == 'stash' then
+		elseif data.type == 'glovebox' or data.type == 'trunk' or (data.type == 'stash' and not data.owner) then
 			local id = data.id
 			if not data.maxWeight then data.maxWeight = data.slots*8000 end
 			Inventories[id] = {
@@ -280,8 +281,25 @@ AddEventHandler('linden_inventory:openInventory', function(data, player)
 				slots = data.slots,
 				coords = data.coords,
 				maxWeight = data.maxWeight,
+				inventory = GetItems(id)
 			}
-			if data.owner then Inventories[id].owner = data.owner end
+			if CheckOpenable(xPlayer, id, data.coords) then
+				Opened[xPlayer.source] = {invid = id, type = data.type}
+				TriggerClientEvent('linden_inventory:openInventory', xPlayer.source, Inventories[xPlayer.source], Inventories[id])
+			end
+		elseif data.owner then
+			if data.owner == true then data.owner = xPlayer.identifier end
+			local id = data.id..'-'..data.owner
+			if not data.maxWeight then data.maxWeight = data.slots*8000 end
+			Inventories[id] = {
+				name = id,
+				owner = data.owner,
+				type = data.type,
+				slots = data.slots,
+				coords = data.coords,
+				maxWeight = data.maxWeight,
+				inventory = GetItems(id)
+			}
 			Inventories[id].inventory = GetItems(id, data.owner)
 			if CheckOpenable(xPlayer, id, data.coords) then
 				Opened[xPlayer.source] = {invid = id, type = data.type}
@@ -404,7 +422,7 @@ AddEventHandler('linden_inventory:saveInventoryData', function(data)
 				invid = playerinv
 			elseif data.frominv == 'TargetPlayer' then
 				targetId = string.gsub(data.invid, 'Player ', '')
-				xTarget = ESX.GetPlayerFromId(targetId)
+				xTarget = ESX.GetPlayerFromId(tonumber(targetId))
 				invid = xTarget.source
 			else
 				invid = data.invid
@@ -455,7 +473,7 @@ AddEventHandler('linden_inventory:saveInventoryData', function(data)
 			if data.frominv == 'Playerinv' then
 				if data.toinv == 'TargetPlayer' then
 					targetId = string.gsub(data.invid, 'Player ', '')
-					xTarget = ESX.GetPlayerFromId(targetId)
+					xTarget = ESX.GetPlayerFromId(tonumber(targetId))
 					invid = xTarget.source
 				else
 					invid = data.invid
@@ -464,7 +482,7 @@ AddEventHandler('linden_inventory:saveInventoryData', function(data)
 			elseif data.toinv == 'Playerinv' then
 				if data.frominv == 'TargetPlayer' then
 					targetId = string.gsub(data.invid2, 'Player ', '')
-					xTarget = ESX.GetPlayerFromId(targetId)
+					xTarget = ESX.GetPlayerFromId(tonumber(targetId))
 					invid2 = xTarget.source
 				else
 					invid2 = data.invid2
@@ -663,12 +681,11 @@ AddEventHandler('linden_inventory:saveInventory', function(data)
 		elseif data.type ~= 'shop' and data.type ~= 'drop' and Inventories[data.invid] and Inventories[data.invid].changed then
 			SaveItems(data.type, data.invid, Inventories[data.invid].owner)
 			Inventories[data.invid].changed = false
-		end
+		elseif data.invid then Opened[data.invid] = nil end
 		Opened[xPlayer.source] = nil
 		updateWeight(xPlayer)
-		if data.invid then Opened[data.invid] = nil end
+		TriggerClientEvent('linden_inventory:refreshInventory', xPlayer.source, Inventories[xPlayer.source])
 	end
-	TriggerClientEvent('linden_inventory:refreshInventory', xPlayer.source, Inventories[xPlayer.source])
 end)
 
 AddEventHandler('esx:playerLogout', function(playerid)
@@ -909,9 +926,9 @@ ESX.RegisterServerCallback('linden_inventory:usingItem', function(source, cb, it
 		cb(xItem)
 		if cItem.useTime then
 			ESX.SetTimeout(cItem.useTime, function()
-				removeInventoryItem(xPlayer, item, cItem.consume, metadata, slot)
+				removeInventoryItem(xPlayer, item, cItem.consume or 1, metadata, slot)
 			end)
-		else removeInventoryItem(xPlayer, item, cItem.consume, metadata, slot) end
+		else removeInventoryItem(xPlayer, item, cItem.consume or 1, metadata, slot) end
 	else
 		TriggerClientEvent('mythic_notify:client:SendAlert', xPlayer.source, { type = 'error', text = 'You do not have enough '..xItem.label })
 	end

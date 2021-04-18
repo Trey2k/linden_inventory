@@ -11,13 +11,13 @@ PlayerDropped = function(src)
 		if data.type == 'TargetPlayer' then
 			updateWeight(ESX.GetPlayerFromId(data.invid))
 			Opened[data.invid] = nil
-			print(src..' disconnected while accessing player inventory '..data.invid)
+			print(GetPlayerName(src)..' disconnected while accessing player inventory '..data.invid)
 		elseif data.type ~= 'shop' and data.type ~= 'drop' and Inventories[data.invid] and Inventories[data.invid].changed then
 			SaveItems(data.type, data.invid)
 			Inventories[data.invid].changed = false
-			print(src..' disconnected while accessing '..data.type..' '..data.invid)
+			print(GetPlayerName(src)..' disconnected while accessing '..data.type..' '..data.invid)
 		else
-			print(src..' disconnected while accessing '..data.type..' '..data.invid)
+			print(GetPlayerName(src)..' disconnected while accessing '..data.type..' '..data.invid)
 		end
 		Opened[src] = nil
 		Inventories[src] = nil
@@ -56,7 +56,7 @@ GenerateText = function(numLetters)
 end
 
 GenerateSerial = function(text)
-	if not text then text = GenerateText(3) end
+	if not text then text = GenerateText(3) elseif string.len(text) > 3 then return text end
 	local random = math.random(100000,999999)
 	local random2 = math.random(100000,999999)
 	local serial = ('%s%s%s'):format(random, text, random2)
@@ -203,23 +203,22 @@ end
 SaveItems = function(type,id,owner)
 	if id and owner == nil and (type == 'stash' or type == 'trunk' or type == 'glovebox') then
 		local inventory = json.encode(getInventory(Inventories[id]))
-		exports.ghmattimysql:scalar('SELECT data FROM linden_inventory WHERE name = @name', {
+		local result = exports.ghmattimysql:scalarSync('SELECT data FROM linden_inventory WHERE name = @name', {
 			['@name'] = id
-		}, function(result)
-			if result then
-				if result ~= inventory then
-					exports.ghmattimysql:execute('UPDATE linden_inventory SET data = @data WHERE name = @name', {
-						['@data'] = inventory,
-						['@name'] = id
-					})
-				end
-			elseif inventory ~= '[]' then
-				exports.ghmattimysql:execute('INSERT INTO linden_inventory (name, data) VALUES (@name, @data)', {
-					['@name'] = id,
-					['@data'] = inventory
+		})
+		if result then
+			if result ~= inventory then
+				exports.ghmattimysql:execute('UPDATE linden_inventory SET data = @data WHERE name = @name', {
+					['@data'] = inventory,
+					['@name'] = id
 				})
 			end
-		end)
+		elseif inventory ~= '[]' then
+			exports.ghmattimysql:execute('INSERT INTO linden_inventory (name, data) VALUES (@name, @data)', {
+				['@name'] = id,
+				['@data'] = inventory
+			})
+		end
 	elseif id and owner then
 		local inventory = json.encode(getInventory(Inventories[id]))
 		local result = exports.ghmattimysql:executeSync('SELECT * FROM linden_inventory WHERE name = @name AND owner = @owner LIMIT 1', {
@@ -241,6 +240,7 @@ SaveItems = function(type,id,owner)
 			})
 		end
 	end
+	Opened[id] = nil
 end
 
 GetItems = function(id, owner)
@@ -291,6 +291,7 @@ UseItem = function(xPlayer, item, notESX)
 		TriggerClientEvent('linden_inventory:useItem', xPlayer.source, item)
 	else
 		if type(item) == 'table' then item = item.name end
-	 	if ESX.UsableItemsCallbacks[item] then TriggerEvent('esx:useItem', xPlayer.source, item) end
+		TriggerClientEvent('linden_inventory:closeInventory', xPlayer.source)
+	 	if ESX.UsableItemsCallbacks[item] then ESX.UsableItemsCallbacks[item](xPlayer.source) end
 	end
 end

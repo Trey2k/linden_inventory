@@ -1,21 +1,24 @@
 checkPlayer = function(xPlayer)
-	if xPlayer.get('linventory') ~= true then count = 0 while true do count = count + 1 if count == 15 then return false end Citizen.Wait(100) end else return true end
+	if xPlayer.get('linventory') ~= true then Citizen.Wait(1500) count = 0 while true do if count > 3 then return false end Citizen.Wait(1000) end count = count + 1 else return true end
 end
 
 getInventoryItem = function(xPlayer, name, metadata)
 	if checkPlayer(xPlayer) ~= true then return end
-	local xItem = Items[name]
-	if not xItem then print(('^1[error]^7 %s does not exist'):format(name)) return end
-	xItem.count = 0
-	for k, v in pairs(Inventories[xPlayer.source].inventory) do
-		if v.name == name then
-			if not v.metadata then v.metadata = {} end
-			if not metadata or is_table_equal(v.metadata, metadata) then
-				xItem.count = xItem.count + v.count
+	if name then
+		local xItem = Items[name]
+		if not xItem then print(('^1[error]^7 %s does not exist'):format(name)) return end
+		xItem.count = 0
+		for k, v in pairs(Inventories[xPlayer.source].inventory) do
+			if v.name == name then
+				if not v.metadata then v.metadata = {} end
+				if not metadata or is_table_equal(v.metadata, metadata) then
+					xItem.count = xItem.count + v.count
+				end
 			end
 		end
+		return xItem
 	end
-	return xItem
+	return
 end
 exports('getInventoryItem', getInventoryItem)
 
@@ -234,7 +237,7 @@ exports('getPlayerInventory', getPlayerInventory)
 
 
 getPlayerSlot = function(xPlayer, slot, item, metadata)
-	while xPlayer.get('linventory') ~= true do Citizen.Wait(100) print(xPlayer.get('linventory')) end
+	if checkPlayer(xPlayer) ~= true then return end
 	if slot > Config.PlayerSlots then return nil end
 	local getSlot = Inventories[xPlayer.source].inventory[slot]
 	if item and getSlot and getSlot.name ~= item then slot = nil end
@@ -245,7 +248,7 @@ exports('getPlayerSlot', getPlayerSlot)
 
 
 getInventoryItemSlots = function(xPlayer, name, metadata)
-	while xPlayer.get('linventory') ~= true do Citizen.Wait(100) print(xPlayer.get('linventory')) end
+	if checkPlayer(xPlayer) ~= true then return end
 	local xItem = Items[name]
 	if not xItem then print(('^1[error]^7 %s does not exist'):format(name)) return end
 	local totalCount, slots, emptySlots = 0, {}, Config.PlayerSlots
