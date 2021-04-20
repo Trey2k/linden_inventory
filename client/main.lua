@@ -1,5 +1,6 @@
 local Blips = {}
 local Drops = {}
+local Usables = {}
 local currentDrop
 local currentWeapon
 local weaponTimer = 0
@@ -40,6 +41,7 @@ StartInventory = function()
 		playerID = GetPlayerServerId(PlayerId())
 		playerName = data.name
 		Drops = data.drops
+		Usables = data.usables
 		inventoryLabel = playerName..' ['..playerID..'] '--[[..ESX.PlayerData.job.grade_label]]
 		PlayerLoaded = true
 		ClearWeapons()
@@ -68,8 +70,7 @@ StartInventory = function()
 		end
 	end)
 end
-
-if PlayerLoaded then StartInventory() end
+if ESX.IsPlayerLoaded() then StartInventory() end
 
 CanOpenInventory = function()
 	if PlayerLoaded and not isBusy and weaponTimer < 250 and not isDead and not isCuffed and not IsPauseMenuActive() then
@@ -383,20 +384,22 @@ end)
 
 RegisterNetEvent('linden_inventory:addAmmo')
 AddEventHandler('linden_inventory:addAmmo', function(ammo)
-	if currentWeapon then
+	if currentWeapon and not isBusy then
 		if currentWeapon.ammoType == ammo.name then
 			local maxAmmo = GetWeaponClipSize(currentWeapon.hash)
 			local curAmmo = GetAmmoInPedWeapon(playerPed, currentWeapon.hash)
 			if curAmmo > maxAmmo then SetPedAmmo(playerPed, currentWeapon.hash, maxAmmo) elseif curAmmo == maxAmmo then return
 			else
+				isBusy = true
 				local newAmmo = 0
 				if curAmmo < maxAmmo then missingAmmo = maxAmmo - curAmmo end
-				if missingAmmo > ammo.count then newAmmo = ammo.count + curAmmo removeAmmo = ammo.count - curAmmo
-				else newAmmo = maxAmmo removeAmmo = missingAmmo end
+				if missingAmmo > ammo.count then newAmmo = ammo.count + curAmmo
+				else newAmmo = maxAmmo end
 				if newAmmo < 0 then newAmmo = 0 end
 				SetPedAmmo(playerPed, currentWeapon.hash, newAmmo)
 				MakePedReload(playerPed)
-				TriggerServerEvent('linden_inventory:addweaponAmmo', currentWeapon, removeAmmo, newAmmo)
+				TriggerServerEvent('linden_inventory:addweaponAmmo', currentWeapon, curAmmo, newAmmo)
+				isBusy = false
 			end
 		else
 			error("You can't load the "..currentWeapon.label.." with "..ammo.label.." ammo")
@@ -451,13 +454,10 @@ TriggerLoops = function()
 				DisableControlAction(0, 257, true)
 			elseif not invOpen and not wait and CanOpenInventory() then
 				for i=1, #Keys, 1 do
-					if IsDisabledControlJustReleased(0, Keys[i]) then
-						Citizen.CreateThread(function()
-							wait = true
+					if not isBusy and IsDisabledControlJustReleased(0, Keys[i]) and ESX.PlayerData.inventory[i] then
+						if Usables[ESX.PlayerData.inventory[i].name] then
 							TriggerServerEvent('linden_inventory:useSlotItem', i)
-							Citizen.Wait(100)
-							wait = false
-						end)
+						end
 					end
 				end
 			end
@@ -769,7 +769,7 @@ RegisterCommand('hotbar', function()
 		items = data
 	})
 end)
-RegisterKeyMapping('hotbar', 'Open vehicle inventory', 'keyboard', 'tab')
+RegisterKeyMapping('hotbar', 'Display inventory hotbar', 'keyboard', 'tab')
 		
 RegisterKeyMapping('inv', 'Open player inventory', 'keyboard', Config.InventoryKey)
 RegisterKeyMapping('vehinv', 'Open vehicle inventory', 'keyboard', Config.VehicleInventoryKey)
@@ -793,7 +793,7 @@ RegisterNUICallback('notification', function(data)
 end)
 
 RegisterNUICallback('useItem', function(data, cb)
-	if data.inv == 'Playerinv' then TriggerServerEvent('linden_inventory:useItem', data.item) end
+	if data.inv == 'Playerinv' and Usables[data.item.name] then TriggerServerEvent('linden_inventory:useItem', data.item) end
 end)
 
 RegisterNUICallback('giveItem', function(data, cb)

@@ -1,8 +1,10 @@
 ESX = nil
 Items = {}
+Usables = {}
 Players = {}
 Drops = {}
 Inventories = {}
+Datastore = {}
 Shops = {}
 Opened = {}
 Status = {'starting', ''}
@@ -58,7 +60,14 @@ exports.ghmattimysql:ready(function()
 					description = v.description,
 					closeonuse = v.closeonuse
 				}
-				if v.name:find('WEAPON') then local AmmoType = GetAmmoType(v.name) if AmmoType then Items[v.name].ammoType = AmmoType end end
+				if Config.ItemList[v.name] or ESX.UsableItemsCallbacks[v.name] ~= nil then Usables[v.name] = true end
+				if v.name:find('WEAPON') then
+					Usables[v.name] = true
+					local AmmoType = GetAmmoType(v.name)
+					if AmmoType then Items[v.name].ammoType = AmmoType end
+				elseif v.name:find('ammo-') then
+					Usables[v.name] = true
+				end
 			end
 			message('Created '..#(result)..' items', 2)
 			Status[1] = 'loaded'
@@ -109,7 +118,7 @@ ESX.RegisterServerCallback('linden_inventory:setup', function(source, cb)
 		end
 	end
 	Inventories[xPlayer.source].name = xPlayer.getName()
-	local data = {drops = Drops, name = Inventories[xPlayer.source].name, inventory = Inventories[xPlayer.source].inventory }
+	local data = {drops = Drops, name = Inventories[xPlayer.source].name, inventory = Inventories[xPlayer.source].inventory, usables = Usables }
 	cb(data)
 	Citizen.Wait(100)
 	updateWeight(xPlayer, true)	
@@ -281,7 +290,7 @@ AddEventHandler('linden_inventory:openInventory', function(data, player)
 				slots = data.slots,
 				coords = data.coords,
 				maxWeight = data.maxWeight,
-				inventory = GetItems(id)
+				inventory = GetItems(id, data.type)
 			}
 			if CheckOpenable(xPlayer, id, data.coords) then
 				Opened[xPlayer.source] = {invid = id, type = data.type}
@@ -298,9 +307,8 @@ AddEventHandler('linden_inventory:openInventory', function(data, player)
 				slots = data.slots,
 				coords = data.coords,
 				maxWeight = data.maxWeight,
-				inventory = GetItems(id)
+				inventory = GetItems(id, data.type, data.owner)
 			}
-			Inventories[id].inventory = GetItems(id, data.owner)
 			if CheckOpenable(xPlayer, id, data.coords) then
 				Opened[xPlayer.source] = {invid = id, type = data.type}
 				TriggerClientEvent('linden_inventory:openInventory', xPlayer.source, Inventories[xPlayer.source], Inventories[id])
@@ -679,9 +687,10 @@ AddEventHandler('linden_inventory:saveInventory', function(data)
 			local invid = Opened[src].invid
 			updateWeight(ESX.GetPlayerFromId(invid))
 			Opened[invid] = nil
-		elseif data.type ~= 'shop' and data.type ~= 'drop' and Inventories[data.invid] and Inventories[data.invid].changed then
-			SaveItems(data.type, data.invid, Inventories[data.invid].owner)
-			Inventories[data.invid].changed = false
+		elseif data.type ~= 'shop' and data.type ~= 'drop' and Inventories[data.invid] then
+			if Inventories[data.invid].changed then	SaveItems(data.type, data.invid, Inventories[data.invid].owner) end
+			Inventories[data.invid] = nil
+			Opened[data.invid] = nil
 		elseif data.invid then Opened[data.invid] = nil end
 		if xPlayer then
 			Opened[src] = nil
@@ -736,7 +745,7 @@ AddEventHandler('linden_inventory:useItem', function(item)
 		elseif Config.Throwable[item] then
 			TriggerClientEvent('linden_inventory:weapon', xPlayer.source, item)
 		end
-	elseif item.name:find('ammo') then
+	elseif item.name:find('ammo-') then
 		TriggerClientEvent('linden_inventory:addAmmo', xPlayer.source, Inventories[xPlayer.source].inventory[item.slot])
 	else
 		local slot = Inventories[xPlayer.source].inventory[item.slot]
@@ -801,7 +810,7 @@ AddEventHandler('linden_inventory:useSlotItem', function(slot)
 				TriggerClientEvent('linden_inventory:weapon', xPlayer.source, Inventories[xPlayer.source].inventory[slot])
 			end
 		else
-			if Inventories[xPlayer.source].inventory[slot].name:find('ammo') then
+			if Inventories[xPlayer.source].inventory[slot].name:find('ammo-') then
 				TriggerClientEvent('linden_inventory:addAmmo', xPlayer.source, Inventories[xPlayer.source].inventory[slot])
 				return
 			end
@@ -849,18 +858,18 @@ AddEventHandler('linden_inventory:decreaseDurability', function(slot, item, ammo
 end)
 
 RegisterNetEvent('linden_inventory:addweaponAmmo')
-AddEventHandler('linden_inventory:addweaponAmmo', function(item, removeAmmo, newAmmo)
+AddEventHandler('linden_inventory:addweaponAmmo', function(item, curAmmo, newAmmo)
 	local xPlayer = ESX.GetPlayerFromId(source)
 	if Inventories[xPlayer.source].inventory[item.slot] ~= nil then
 		if Inventories[xPlayer.source].inventory[item.slot].metadata.ammo ~= nil then
 			local ammo = Items[item.ammoType]
 			local count = newAmmo
 			local addweight = (count * ammo.weight)
+			local removeAmmo = newAmmo - curAmmo
 			Inventories[xPlayer.source].inventory[item.slot].metadata.ammo = count
 			Inventories[xPlayer.source].inventory[item.slot].weight = Items[item.name].weight + addweight
 			removeInventoryItem(xPlayer, ammo.name, removeAmmo)
 		end
-		TriggerEvent('linden_inventory:decreaseDurability', item.slot, item.name, removeAmmo, xPlayer)
 	end
 end)
 
@@ -870,14 +879,18 @@ AddEventHandler('linden_inventory:updateWeapon', function(item, type)
 	local xPlayer = ESX.GetPlayerFromId(source)
 	if Inventories[xPlayer.source].inventory[item.slot] ~= nil then
 		if Inventories[xPlayer.source].inventory[item.slot].metadata.ammo ~= nil then
+			local lastAmmo = Inventories[xPlayer.source].inventory[item.slot].metadata.ammo
 			Inventories[xPlayer.source].inventory[item.slot].metadata = item.metadata
 			if not type and item.ammoType then
 				local ammo = Items[item.ammoType]
+				local newAmmo = item.metadata.ammo
+				local ammoDiff = lastAmmo - newAmmo
 				ammo.count = Inventories[xPlayer.source].inventory[item.slot].metadata.ammo
 				ammo.addweight = (ammo.count * ammo.weight)
 				Inventories[xPlayer.source].inventory[item.slot].weight = Items[item.name].weight + ammo.addweight
+				TriggerEvent('linden_inventory:decreaseDurability', item.slot, item.name, ammoDiff, xPlayer)
 			end
-			TriggerClientEvent('linden_inventory:refreshInventory', xPlayer.source, Inventories[xPlayer.source])
+			if Opened[xPlayer.source] or not ammo then TriggerClientEvent('linden_inventory:refreshInventory', xPlayer.source, Inventories[xPlayer.source], Inventories[xPlayer.source].inventory[item.slot].metadata) end
 			TriggerClientEvent('linden_inventory:updateWeapon', xPlayer.source, Inventories[xPlayer.source].inventory[item.slot].metadata)
 		else
 			if type == 'throw' then
