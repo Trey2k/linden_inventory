@@ -4,11 +4,11 @@ Config.General = {
 		colour = 69,
 		scale = 0.6
 	}, inventory = {
-		{ name = 'burger', price = 10 },
-		{ name = 'sandwich', price = 10 },
-		{ name = 'water', price = 10 },
-		{ name = 'cola', price = 10 },
-		{ name = 'bandage', price = 10 },
+		{ name = 'burger', price = 5 },
+		{ name = 'plastic_pouch', price = 3 },
+		{ name = 'water', price = 3 },
+		{ name = 'cola', price = 4 },
+		{ name = 'bandage', price = 8 },
 	}
 }
 
@@ -29,7 +29,7 @@ Config.YouTool = {
 		colour = 69,
 		scale = 0.6
 	}, inventory = {
-		{ name = 'lockpick', price = 10 },
+		{ name = 'lockpick', price = 40 },
 	}
 }
 
@@ -39,7 +39,27 @@ Config.Nail = {
 		colour = 69,
 		scale = 0.6
 	}, inventory = {
-		{ name = 'lockpick', price = 10 },
+		{ name = 'lockpick', price = 40 },
+	}
+}
+
+Config.SmokeOnTheWater = {
+	blip = {
+		id = 469,
+		colour = 69,
+		scale = 0.6
+	}, inventory = {
+		{ name = 'weed_seed', price = 35 },
+	}
+}
+
+Config.MirrorParkWeedShop = {
+	blip = {
+		id = 469,
+		colour = 69,
+		scale = 0.6
+	}, inventory = {
+		{ name = 'weed_seed', price = 35 },
 	}
 }
 
@@ -47,7 +67,7 @@ Config.Ammunation = {
 	blip = {
 		id = 110,
 		colour = 69,
-		scale = 0.6
+		scale = 0.8
 	}, inventory = {
 		{ name = 'ammo-9', price = 5, },
 		{ name = 'WEAPON_KNIFE', price = 200 },
@@ -103,9 +123,14 @@ Config.Shops = {
 	{ type = Config.Liquor, coords = vector3(1392.562, 3604.684, 34.980), name = 'Rob\'s Liquor' },
 	{ type = Config.Liquor, coords = vector3(-1393.409, -606.624, 30.319), name = 'Rob\'s Liquor' },
 
+	{ type = Config.YouTool, coords = vector3(45.72, -1748.88, 29.65), name = 'YouTool' },
 	{ type = Config.YouTool, coords = vector3(2748.0, 3473.0, 55.67), name = 'YouTool' },
 	{ type = Config.YouTool, coords = vector3(342.99, -1298.26, 32.51), name = 'YouTool' }, 
-	{ type = Config.Nail, coords = vector3(225.12, -1544.4, 29.29), name = 'Nail Salon' }, 
+	{ type = Config.Nail, coords = vector3(225.12, -1544.4, 29.29), name = 'Nail Salon' },  -- the nail salon in the south side addon 
+	{ type = Config.SmokeOnTheWater, coords = vector3(-1172.3, -1571.92, 4.65), name = 'Smoke on the water' }, -- smoke on the water vespuchie beach 
+	{ type = Config.MirrorParkWeedShop, coords = vector3(1175.25, -437.26, 66.90), name = 'Mirror Park dispensary' },
+
+
 
 	{ coords = vector3(-531.14, -1221.33, 18.48), name = 'Xero Gas'},
 	{ coords = vector3(2557.458,  382.282, 108.622), name = '24/7'},
