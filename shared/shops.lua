@@ -23,23 +23,40 @@ Config.Liquor = {
 	}
 }
 
+Config.Burger = {
+	blip = {
+		id = 304,
+		colour = 69,
+		scale = 0.9
+	}, inventory = {
+		{ name = 'burger', price = 10 },
+		{ name = 'water', price = 10 },
+		{ name = 'cola', price = 10 },
+	}
+}
+
 Config.YouTool = {
 	blip = {
 		id = 402,
 		colour = 69,
-		scale = 0.6
+		scale = 0.9
 	}, inventory = {
 		{ name = 'lockpick', price = 40 },
+		{ name = 'repairkit', price = 1500 },
+		{ name = 'radio', price = 150 },
+		{ name = 'tongs', price = 150 },
+		{ name = 'steel_pickaxe', price = 450, metadata={type= '300'} },
+		{ name = 'titanium_pickaxe', price = 1450, metadata={type= '600'} },
 	}
 }
 
 Config.Nail = {
 	blip = {
-		id = 402,
+		id = 121,
 		colour = 69,
-		scale = 0.6
+		scale = 0.9
 	}, inventory = {
-		{ name = 'lockpick', price = 40 },
+		{ name = 'acetone', price = 75 },
 	}
 }
 
@@ -49,7 +66,26 @@ Config.SmokeOnTheWater = {
 		colour = 69,
 		scale = 0.6
 	}, inventory = {
+		
+		{ name = 'weed', price = 9 },
+		{ name = 'weed_pouch', price = 500 },
 		{ name = 'weed_seed', price = 35 },
+	}
+}
+
+Config.StockMarket = {
+	blip = {
+		
+		id = 605,
+		colour = 69,
+		scale = 0.8
+		
+	}, inventory = {
+		{ name = 'BTC', price = 50870 },
+		{ name = 'SMP500', price = 4180 },
+		{ name = 'Tesla', price = 729 },
+		{ name = 'Amazon', price = 3340 },
+		{ name = 'SpaceX', price = 9001 },
 	}
 }
 
@@ -57,8 +93,10 @@ Config.MirrorParkWeedShop = {
 	blip = {
 		id = 469,
 		colour = 69,
-		scale = 0.6
+		scale = 0.9
 	}, inventory = {
+		{ name = 'weed', price = 9 },
+		{ name = 'weed_pouch', price = 500 },
 		{ name = 'weed_seed', price = 35 },
 	}
 }
@@ -80,11 +118,13 @@ Config.PoliceArmoury = {
 	blip = {
 		id = 110,
 		colour = 84,
-		scale = 0.6
+		scale = 0.8
 	}, inventory = {
 		{ name = 'ammo-9', price = 5, },
 		{ name = 'ammo-rifle', price = 5, },
+		{ name = 'repairkit', price = 1500 },
 		{ name = 'WEAPON_FLASHLIGHT', price = 200 },
+		{ name = 'radio', price = 150 },
 		{ name = 'WEAPON_NIGHTSTICK', price = 100 },
 		{ name = 'WEAPON_PISTOL', price = 500, metadata = { registered = true, serial = 'POL' }, license = 'weapon' },
 		{ name = 'WEAPON_CARBINERIFLE', price = 1000, metadata = { registered = true, serial = 'POL' }, license = 'weapon', grade = 3 },
@@ -96,12 +136,18 @@ Config.Medicine = {
 	blip = {
 		id = 403,
 		colour = 69,
-		scale = 0.6
+		scale = 0.8
 	}, inventory = {
-		{ name = 'medikit', price = 26 },
+		{ name = 'medkit', price = 50 },
+		{ name = 'bandage', price = 3 },
+		{ name = 'radio', price = 120 },
+		{ name = 'repairkit', price = 1000 },
 		{ name = 'WEAPON_STUNGUN', price = 500, metadata = { registered = true, serial = 'EMS' } },
 	}
 }
+
+ 
+
 
 
 Config.Shops = {
@@ -126,11 +172,18 @@ Config.Shops = {
 	{ type = Config.YouTool, coords = vector3(45.72, -1748.88, 29.65), name = 'YouTool' },
 	{ type = Config.YouTool, coords = vector3(2748.0, 3473.0, 55.67), name = 'YouTool' },
 	{ type = Config.YouTool, coords = vector3(342.99, -1298.26, 32.51), name = 'YouTool' }, 
+
+
+	---------------------------- OUR SHOPS ADDED ------------------------------------------------------
+
 	{ type = Config.Nail, coords = vector3(225.12, -1544.4, 29.29), name = 'Nail Salon' },  -- the nail salon in the south side addon 
-	{ type = Config.SmokeOnTheWater, coords = vector3(-1172.3, -1571.92, 4.65), name = 'Smoke on the water' }, -- smoke on the water vespuchie beach 
-	{ type = Config.MirrorParkWeedShop, coords = vector3(1175.25, -437.26, 66.90), name = 'Mirror Park dispensary' },
+	{ type = Config.SmokeOnTheWater, coords = vector3(-1172.3, -1571.92, 4.65), name = 'Smoke on the water' }, -- smoke on the water vespuchie beach  -- has bulk weed sales in back 
+	{ type = Config.MirrorParkWeedShop, coords = vector3(1175.25, -437.26, 66.90), name = 'Mirror Park dispensary' }, -- mirror park dispensary		-- has bulk weed sales in back 
+	{ type = Config.StockMarket, coords = vector3(232.18, -1095, 29.29), name = 'Stock Market' }, -- stock market shop 
+	{ type = Config.Burger, coords = vector3(-1193.19, -893.63, 13.9), name = 'Burger Shot' },
 
 
+	------------------- gas stations and 24/7's ------------------------------------------------------------
 
 	{ coords = vector3(-531.14, -1221.33, 18.48), name = 'Xero Gas'},
 	{ coords = vector3(2557.458,  382.282, 108.622), name = '24/7'},
@@ -151,5 +204,5 @@ Config.Shops = {
 
 	
 	{ type = Config.PoliceArmoury, job = 'police', coords = vector3(452.56, -983.89, 30.69), name = 'Police Armoury'},
-	{ type = Config.Medicine, job = 'ambulance', coords = vector3(306.3687, -601.5139, 43.28406), name = 'Medicine Cabinet'},
+	{ type = Config.Medicine, job = 'ambulance', coords = vector3(325.17, -582.7, 43.39), name = 'Medicine Cabinet'},
 }

@@ -906,6 +906,7 @@ AddEventHandler('linden_inventory:useItem',function(item)
 				end
 
 				if data.event then TriggerEvent(data.event) end
+				if data.serverEvent then TriggerServerEvent(data.serverEvent, item) end
 
 				isBusy = false
 			end

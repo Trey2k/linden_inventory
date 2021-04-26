@@ -117,7 +117,7 @@ Config.ItemList = {
 	['at_skin_sniper_gold'] = { component = {`COMPONENT_MARKSMANRIFLE_VARMOD_LUXE`}, useTime = 2500 },
 
 	['burger'] = {
-		hunger = 200000,
+		hunger = 2000000,
 		animDict = 'mp_player_inteat@burger',
 		anim = 'mp_player_int_eat_burger_fp',
 		model = 'prop_cs_burger_01',
@@ -128,7 +128,7 @@ Config.ItemList = {
 	},
 
 	['water'] = {
-		thirst = 200000,
+		thirst = 2000000,
 		animDict = 'mp_player_intdrink',
 		anim = 'loop_bottle',
 		model = 'prop_ld_flow_bottle',
@@ -179,6 +179,24 @@ Config.ItemList = {
 		useTime = 2000,
 		consume = 0,
 		dofirst = 'esx_lockpick:onUse'
+	},
+
+	['green-dongle'] = {
+		useTime = 0,
+		consume = 0,
+		serverEvent = 'weasel-heist:useDongle'
+	},
+
+	['yellow-dongle'] = {
+		useTime = 0,
+		consume = 0,
+		serverEvent = 'weasel-heist:useDongle'
+	},
+
+	['red-dongle'] = {
+		useTime = 0,
+		consume = 0,
+		serverEvent = 'weasel-heist:useDongle'
 	},
 
 }
