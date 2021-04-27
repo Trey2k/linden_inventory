@@ -135,6 +135,7 @@ CreateNewDrop = function(xPlayer, data)
 			if Config.Logs then
 				exports.linden_logs:log(xPlayer, false, 'has dropped '..data.item.count..'x '..data.item.name..' in drop-'..invid, 'items')
 			end
+			Opened[xPlayer.source] = nil
 			TriggerClientEvent('linden_inventory:createDrop', -1, Drops[invid], xPlayer.source)
 		end
 	elseif data.type == 'split' then
@@ -145,6 +146,7 @@ CreateNewDrop = function(xPlayer, data)
 			if Config.Logs then
 				exports.linden_logs:log(xPlayer, false, 'has dropped '..data.newslotItem.count..'x '..data.newslotItem.name,' in drop-'..invid, 'items')
 			end
+			Opened[xPlayer.source] = nil
 			TriggerClientEvent('linden_inventory:createDrop', -1, Drops[invid], xPlayer.source)
 		end
 	end
@@ -333,15 +335,4 @@ ValidateString = function(item)
 	if item:find('weapon_') then item = string.upper(item) end
 	local xItem = Items[item]
 	if xItem then return xItem.name end
-end
-
-UseItem = function(xPlayer, item, notESX)
-	if notESX or Config.ItemList[item.name] then
-		if next(Config.ItemList[item.name]) == nil then return end
-		TriggerClientEvent('linden_inventory:useItem', xPlayer.source, item)
-	else
-		if type(item) == 'table' then item = item.name end
-		TriggerClientEvent('linden_inventory:closeInventory', xPlayer.source)
-		ESX.UseItem(xPlayer.source, item)
-	end
 end

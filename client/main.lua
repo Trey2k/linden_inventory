@@ -54,17 +54,17 @@ StartInventory = function()
 			Blips = {}
 		end
 		for k, v in pairs(Config.Shops) do
-			if (not Config.Shops[k].job or Config.Shops[k].job == ESX.PlayerData.job.name) then
-				local name, data = 'Shop'
-				if v.type then data = v.type.blip else data =  Config.General.blip end
+			if not v.type then v.type = Config.General end
+			if v.type and v.type.blip and (not v.job or v.job == ESX.PlayerData.job.name) then
+				local data = v.type
 				Blips[k] = AddBlipForCoord(v.coords.x, v.coords.y, v.coords.z)
-				SetBlipSprite(Blips[k], data.id)
+				SetBlipSprite(Blips[k], data.blip.id)
 				SetBlipDisplay(Blips[k], 4)
-				SetBlipScale(Blips[k], data.scale)
-				SetBlipColour(Blips[k], data.colour)
+				SetBlipScale(Blips[k], data.blip.scale)
+				SetBlipColour(Blips[k], data.blip.colour)
 				SetBlipAsShortRange(Blips[k], true)
 				BeginTextCommandSetBlipName('STRING')
-				AddTextComponentString(name)
+				AddTextComponentString(data.name)
 				EndTextCommandSetBlipName(Blips[k])
 			end
 		end
@@ -180,7 +180,7 @@ WeightActions = function(current, max)
 end
 
 local nui_focus = {false, false}
-SetNuiFocusAdvanced = function(hasFocus, hasCursor, allowMovement)
+SetNuiFocusAdvanced = function(hasFocus, hasCursor)
 	SetNuiFocus(hasFocus, hasCursor)
 	SetNuiFocusKeepInput(hasFocus)
 	nui_focus = {hasFocus, hasCursor}
@@ -199,7 +199,7 @@ SetNuiFocusAdvanced = function(hasFocus, hasCursor, allowMovement)
 				end
 				EnableControlAction(0, 249, true) -- N for PTT
 				EnableControlAction(0, 20, true) -- Z for proximity
-				if allowMovement and not currentInventory then
+				if movement and not currentInventory then
 					EnableControlAction(0, 30, true) -- movement
 					EnableControlAction(0, 31, true) -- movement
 				end
@@ -232,7 +232,7 @@ AddEventHandler('linden_inventory:openInventory',function(data, rightinventory)
 		})
 		ESX.PlayerData.inventory = data.inventory
 		if not rightinventory then movement = true else movement = false end
-		SetNuiFocusAdvanced(true, true, movement)
+		SetNuiFocusAdvanced(true, true)
 		currentInventory = rightinventory
 	end
 end)
@@ -285,16 +285,14 @@ RegisterNetEvent('linden_inventory:createDrop')
 AddEventHandler('linden_inventory:createDrop', function(data, owner)
 	Drops[data.name] = data
 	Drops[data.name].coords = vector3(data.coords.x, data.coords.y,data.coords.z - 0.2)
-	Citizen.Wait(0)
-	if owner == playerID then TriggerServerEvent('linden_inventory:openInventory', {type = 'drop', drop = data.name }) end
+	if owner == playerID and invOpen and #(playerCoords - data.coords) <= 1 then TriggerServerEvent('linden_inventory:openInventory', {type = 'drop', drop = data.name }) end
 end)
 
 RegisterNetEvent('linden_inventory:removeDrop')
 AddEventHandler('linden_inventory:removeDrop', function(id, owner)
 	Drops[id] = nil
 	if currentDrop and currentDrop.name == id then currentDrop = nil end
-	Citizen.Wait(0)
-	if owner == playerID then TriggerServerEvent('linden_inventory:openInventory', {type = 'drop', drop = {} }) end
+	if owner == playerID and invOpen then TriggerServerEvent('linden_inventory:openInventory', {type = 'drop', drop = {} }) movement = true end
 end)
 
 HolsterWeapon = function(item)
@@ -364,6 +362,7 @@ AddEventHandler('linden_inventory:weapon', function(item)
 		end
 		ClearPedSecondaryTask(playerPed)
 		TriggerEvent('linden_inventory:busy', false)
+		useItemCooldown = false
 	end
 end)
 
@@ -386,7 +385,7 @@ RegisterNetEvent('linden_inventory:addAmmo')
 AddEventHandler('linden_inventory:addAmmo', function(ammo)
 	if currentWeapon and not isBusy then
 		if currentWeapon.ammoType == ammo.name then
-			local maxAmmo = GetWeaponClipSize(currentWeapon.hash)
+			local maxAmmo = GetMaxAmmoInClip(playerPed, currentWeapon.hash, 1)
 			local curAmmo = GetAmmoInPedWeapon(playerPed, currentWeapon.hash)
 			if curAmmo > maxAmmo then SetPedAmmo(playerPed, currentWeapon.hash, maxAmmo) elseif curAmmo == maxAmmo then return
 			else
@@ -399,7 +398,7 @@ AddEventHandler('linden_inventory:addAmmo', function(ammo)
 				SetPedAmmo(playerPed, currentWeapon.hash, newAmmo)
 				MakePedReload(playerPed)
 				TriggerServerEvent('linden_inventory:addweaponAmmo', currentWeapon, curAmmo, newAmmo)
-				isBusy = false
+				isBusy, useItemCooldown = false, false
 			end
 		else
 			error("You can't load the "..currentWeapon.label.." with "..ammo.label.." ammo")
@@ -409,7 +408,7 @@ end)
 
 RegisterNetEvent('linden_inventory:updateWeapon')
 AddEventHandler('linden_inventory:updateWeapon',function(data)
-	if currentWeapon then
+	if currentWeapon and (not currentWeapon.serial or currentWeapon.serial == data.serial) then
 		currentWeapon.metadata = data
 		if currentWeapon.metadata.durability <= 0 then DisarmPlayer() end
 	end
@@ -425,6 +424,13 @@ AddEventHandler('linden_inventory:closeInventory',function()
 	SendNUIMessage({
 		message = 'close',
 	})
+	TriggerScreenblurFadeOut(0)
+	if lastVehicle then
+		CloseVehicle(lastVehicle)
+	end
+	SetNuiFocusAdvanced(false, false)
+	currentInventory = nil
+	invOpen = false
 end)
 
 AddEventHandler('onResourceStop', function(resourceName)
@@ -455,9 +461,7 @@ TriggerLoops = function()
 			elseif not invOpen and not wait and CanOpenInventory() then
 				for i=1, #Keys, 1 do
 					if not isBusy and IsDisabledControlJustReleased(0, Keys[i]) and ESX.PlayerData.inventory[i] then
-						if Usables[ESX.PlayerData.inventory[i].name] then
-							TriggerServerEvent('linden_inventory:useSlotItem', i)
-						end
+						TriggerEvent('linden_inventory:useItem', ESX.PlayerData.inventory[i])
 					end
 				end
 			end
@@ -540,12 +544,13 @@ TriggerLoops = function()
 						sleep = 5
 						DrawMarker(2, Config.Shops[id].coords.x,Config.Shops[id].coords.y,Config.Shops[id].coords.z, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.3, 0.2, 0.15, 30, 150, 30, 222, false, false, false, true, false, false, false)			
 						local distance = #(playerCoords - Config.Shops[id].coords)
-						if distance <= 1 then text='[~g~E~s~] '..Config.Shops[id].name
+						local name = Config.Shops[id].name or Config.Shops[id].type.name
+						if distance <= 1 then text='[~g~E~s~] '..name
 							if IsControlJustPressed(0, 38) then
 								OpenShop(id)
 							end
 						elseif distance > 4 then id, type = nil, nil
-						else text = Config.Shops[id].name end
+						else text = Config.Shops[id].name or Config.Shops[id].type.name end
 						if distance <= 2 then DrawText3D(Config.Shops[id].coords, text) end
 					else
 						for k, v in pairs(Config.Shops) do
@@ -793,7 +798,7 @@ RegisterNUICallback('notification', function(data)
 end)
 
 RegisterNUICallback('useItem', function(data, cb)
-	if data.inv == 'Playerinv' and Usables[data.item.name] then TriggerServerEvent('linden_inventory:useItem', data.item) end
+	if data.inv == 'Playerinv' then TriggerEvent('linden_inventory:useItem', data.item) end
 end)
 
 RegisterNUICallback('giveItem', function(data, cb)
@@ -833,14 +838,9 @@ local useItemCooldown = false
 RegisterNetEvent('linden_inventory:useItem')
 AddEventHandler('linden_inventory:useItem',function(item)
 	if CanOpenInventory() and not useItemCooldown then
-		useItemCooldown = true
-		ESX.SetTimeout(500, function()
-			useItemCooldown = false
-		end)
 		local data = Config.ItemList[item.name]
-		if not data or not next(data) then return end
-
-		if data.component then
+		local esxItem = Usables[item.name]
+		if data and data.component then
 			if not currentWeapon then isBusy = false return end
 			local result, esxWeapon = ESX.GetWeapon(currentWeapon.name)
 				
@@ -857,18 +857,19 @@ AddEventHandler('linden_inventory:useItem',function(item)
 				error("This weapon already has a "..item.label) isBusy = false return
 			end
 		end
-
+		useItemCooldown = true
+			
+		if esxItem then isBusy = true TriggerEvent('linden_inventory:closeInventory') end
 		ESX.TriggerServerCallback('linden_inventory:usingItem', function(xItem)
-			if xItem then
+			if xItem and data then
 				if data.dofirst then TriggerEvent(data.dofirst) end
 				if data.useTime and data.useTime >= 0 then
-					isBusy = true
 					if not data.animDict or not data.anim then
 						data.animDict = 'pickup_object'
 						data.anim = 'putdown_low'
 					end
 					if not data.flags then data.flags = 48 end
-					
+						
 					exports['mythic_progbar']:Progress({
 						name = 'useitem',
 						duration = data.useTime,
@@ -878,10 +879,10 @@ AddEventHandler('linden_inventory:useItem',function(item)
 						controlDisables = { disableMovement = data.disableMove, disableCarMovement = false, disableMouse = false, disableCombat = true },
 						animation = { animDict = data.animDict, anim = data.anim, flags = data.flags },
 						prop = { model = data.model, coords = data.coords, rotation = data.rotation }
-					}, function() isBusy = false end)
-				else isBusy = false end
+					})
+				end
 				Citizen.Wait(data.useTime)
-		
+			
 				if data.hunger then
 					if data.hunger > 0 then TriggerEvent('esx_status:add', 'hunger', data.hunger)
 					else TriggerEvent('esx_status:remove', 'hunger', data.hunger) end
@@ -910,6 +911,8 @@ AddEventHandler('linden_inventory:useItem',function(item)
 
 				isBusy = false
 			end
-		end, item.name, item.slot, item.metadata)
+			useItemCooldown = false
+			isBusy = false
+		end, item.name, item.slot, item.metadata, esxItem)
 	end
 end)

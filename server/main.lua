@@ -60,14 +60,8 @@ exports.ghmattimysql:ready(function()
 					description = v.description,
 					closeonuse = v.closeonuse
 				}
-				if Config.ItemList[v.name] or ESX.UsableItemsCallbacks[v.name] ~= nil then Usables[v.name] = true end
-				if v.name:find('WEAPON') then
-					Usables[v.name] = true
-					local AmmoType = GetAmmoType(v.name)
-					if AmmoType then Items[v.name].ammoType = AmmoType end
-				elseif v.name:find('ammo-') then
-					Usables[v.name] = true
-				end
+				if ESX.UsableItemsCallbacks[v.name] ~= nil and not Config.ItemList[v.name] then Usables[v.name] = true end
+				if v.name:find('WEAPON') then local AmmoType = GetAmmoType(v.name) if AmmoType then Items[v.name].ammoType = AmmoType end end
 			end
 			message('Created '..#(result)..' items', 2)
 			Status[1] = 'loaded'
@@ -267,7 +261,7 @@ AddEventHandler('linden_inventory:openInventory', function(data, player)
 			Shops[id] = {
 				id = id,
 				type = 'shop',
-				name = shop.name,
+				name = shop.name or shop.type.name,
 				coords = shop.coords,
 				job = shop.job,
 				inventory = SetupShopItems(id),
@@ -594,13 +588,13 @@ AddEventHandler('linden_inventory:saveInventoryData', function(data)
 								ItemNotify(xTarget, data.toItem, data.toItem.count, data.toSlot, 'Added')
 								ItemNotify(xTarget, data.fromItem, data.fromItem.count, data.fromSlot, 'Removed')
 								if Config.Logs then
-									exports.linden_logs:log(xPlayer, xTarget, 'has given '..data.item.count..'x '..data.item.name..' to', 'items')
-									exports.linden_logs:log(xPlayer, xTarget, 'has taken '..data.item.count..'x '..data.item.name..' from', 'items')
+									exports.linden_logs:log(xPlayer, xTarget, 'has given '..data.fromItem.count..'x '..data.fromItem.name..' to', 'items')
+									exports.linden_logs:log(xPlayer, xTarget, 'has taken '..data.toItem.count..'x '..data.toItem.name..' from', 'items')
 								end
 							else
 								if Config.Logs then
-									exports.linden_logs:log(xPlayer, false, 'has stored '..data.item.count..'x '..data.item.name..' in '..invid, 'items')
-									exports.linden_logs:log(xPlayer, false, 'has taken '..data.item.count..'x '..data.item.name..' from '..invid, 'items')
+									exports.linden_logs:log(xPlayer, false, 'has stored '..data.fromItem.count..'x '..data.fromItem.name..' in '..invid, 'items')
+									exports.linden_logs:log(xPlayer, false, 'has taken '..data.toItem.count..'x '..data.toItem.name..' from '..invid, 'items')
 								end
 							end
 						end
@@ -628,11 +622,11 @@ AddEventHandler('linden_inventory:saveInventoryData', function(data)
 							if targetId then
 								ItemNotify(xTarget, data.item, count, data.toSlot, 'Added')
 								if Config.Logs then
-									exports.linden_logs:log(xPlayer, false, 'has taken '..data.item.count..'x '..data.item.name..' from', 'items')
+									exports.linden_logs:log(xPlayer, false, 'has given '..data.item.count..'x '..data.item.name..' to', 'items')
 								end
 							else
 								if Config.Logs then
-									exports.linden_logs:log(xPlayer, false, 'has taken '..data.item.count..'x '..data.item.name..' from '..invid, 'items')
+									exports.linden_logs:log(xPlayer, false, 'has stored '..data.item.count..'x '..data.item.name..' in '..invid, 'items')
 								end
 							end
 						end
@@ -711,13 +705,16 @@ AddEventHandler('esx:playerDropped', function(playerid)
 			SaveItems(data.type, data.invid, Inventories[data.invid].owner)
 			Inventories[data.invid].changed = false
 		elseif data.invid then Opened[data.invid] = nil end
-		if Inventories[playerid] then
-			local xPlayer = ESX.GetPlayerFromId(playerid)
-			if xPlayer then
-				if Inventories[playerid].name ~= xPlayer.getName() then Inventories[playerid] = nil end
-			else Inventories[playerid] = nil end 
-		end
 		Opened[playerid] = nil
+	end
+end)
+
+AddEventHandler('playerDropped', function(reason)
+	local playerid = source
+	if Inventories[playerid] then
+		ESX.SetTimeout(2000, function()	
+			Inventories[playerid] = nil
+		end)
 	end
 end)
 
@@ -729,41 +726,6 @@ AddEventHandler('linden_inventory:devtool', function()
 			exports.linden_logs:log(xPlayer, false, 'kicked for opening nui_devtools', 'kick')
 		end
 		DropPlayer(source, 'foxtrot-uniform-charlie-kilo')
-	end
-end)
-
-RegisterNetEvent('linden_inventory:useItem')
-AddEventHandler('linden_inventory:useItem', function(item)
-	local xPlayer = ESX.GetPlayerFromId(source)
-	if item.name:find('WEAPON_') then
-		if item.metadata.durability ~= nil then
-			if item.metadata.durability > 0 then 
-				TriggerClientEvent('linden_inventory:weapon', xPlayer.source, item)
-			else
-				TriggerClientEvent('mythic_notify:client:SendAlert', xPlayer.source, { type = 'error', text = 'This weapon is broken' })
-			end
-		elseif Config.Throwable[item] then
-			TriggerClientEvent('linden_inventory:weapon', xPlayer.source, item)
-		end
-	elseif item.name:find('ammo-') then
-		TriggerClientEvent('linden_inventory:addAmmo', xPlayer.source, Inventories[xPlayer.source].inventory[item.slot])
-	else
-		local slot = Inventories[xPlayer.source].inventory[item.slot]
-		local invItem = getInventoryItem(xPlayer, item.name)
-		if Config.ItemList[item.name] then
-			local consume = Config.ItemList[item.name].consume or 1
-			if slot == nil or slot.name ~= item.name then
-				if invItem.count > consume then
-					slot = item
-				else
-					TriggerClientEvent('mythic_notify:client:SendAlert', xPlayer.source, { type = 'error', text = 'You do not have enough '..item.label })
-					return
-				end
-			end
-			UseItem(xPlayer, slot, true)
-		else
-			UseItem(xPlayer, item)
-		end
 	end
 end)
 
@@ -794,31 +756,6 @@ AddEventHandler('linden_inventory:reloadWeapon', function(weapon)
 		if ammo.count > 0 then TriggerClientEvent('linden_inventory:addAmmo', xPlayer.source, ammo) end
 	end
 end)
-
-RegisterNetEvent('linden_inventory:useSlotItem')
-AddEventHandler('linden_inventory:useSlotItem', function(slot)
-	local xPlayer = ESX.GetPlayerFromId(source)
-	if Inventories[xPlayer.source].inventory[slot] ~= nil and Inventories[xPlayer.source].inventory[slot].name ~= nil then
-		if Inventories[xPlayer.source].inventory[slot].name:find('WEAPON_') then
-			if Inventories[xPlayer.source].inventory[slot].metadata.durability ~= nil then
-				if Inventories[xPlayer.source].inventory[slot].metadata.durability > 0 then
-					TriggerClientEvent('linden_inventory:weapon', xPlayer.source, Inventories[xPlayer.source].inventory[slot])
-				else
-					TriggerClientEvent('mythic_notify:client:SendAlert', xPlayer.source, { type = 'error', text = 'This weapon is broken' })
-				end
-			elseif Config.Throwable[Inventories[xPlayer.source].inventory[slot].name] then
-				TriggerClientEvent('linden_inventory:weapon', xPlayer.source, Inventories[xPlayer.source].inventory[slot])
-			end
-		else
-			if Inventories[xPlayer.source].inventory[slot].name:find('ammo-') then
-				TriggerClientEvent('linden_inventory:addAmmo', xPlayer.source, Inventories[xPlayer.source].inventory[slot])
-				return
-			end
-			UseItem(xPlayer, Inventories[xPlayer.source].inventory[slot])
-		end
-	end
-end)
-
 
 RegisterNetEvent('linden_inventory:decreaseDurability')
 AddEventHandler('linden_inventory:decreaseDurability', function(slot, item, ammo, xPlayer)
@@ -897,6 +834,10 @@ AddEventHandler('linden_inventory:updateWeapon', function(item, type)
 				removeInventoryItem(xPlayer, item.name, 1, item.metadata, item.slot)
 			elseif type == 'melee' then
 				TriggerEvent('linden_inventory:decreaseDurability', item.slot, item.name, 1, xPlayer)
+			else
+				Inventories[xPlayer.source].inventory[item.slot].metadata.durability = item.metadata.durability
+				if Opened[xPlayer.source] then TriggerClientEvent('linden_inventory:refreshInventory', xPlayer.source, Inventories[xPlayer.source]) end
+				TriggerClientEvent('linden_inventory:updateWeapon', xPlayer.source, Inventories[xPlayer.source].inventory[item.slot].metadata)
 			end
 		end
 	end
@@ -946,19 +887,39 @@ ESX.RegisterServerCallback('linden_inventory:buyLicense', function(source, cb)
 	end
 end)
 
-ESX.RegisterServerCallback('linden_inventory:usingItem', function(source, cb, item, slot, metadata)
+ESX.RegisterServerCallback('linden_inventory:usingItem', function(source, cb, item, slot, metadata, isESX)
 	local xPlayer = ESX.GetPlayerFromId(source)
 	local xItem = getInventoryItem(xPlayer, item, metadata, slot)
-	local cItem = Config.ItemList[xItem.name]
-	if not cItem.consume or xItem.count >= cItem.consume then
-		cb(xItem)
-		if cItem.useTime then
-			ESX.SetTimeout(cItem.useTime, function()
-				removeInventoryItem(xPlayer, item, cItem.consume or 1, metadata, slot)
-			end)
-		else removeInventoryItem(xPlayer, item, cItem.consume or 1, metadata, slot) end
-	else
-		TriggerClientEvent('mythic_notify:client:SendAlert', xPlayer.source, { type = 'error', text = 'You do not have enough '..xItem.label })
+	if isESX and xItem.count > 0 then
+		ESX.UseItem(xPlayer.source, xItem.name)
+		cb(false)
+	elseif xItem.count > 0 then
+		if xItem.name:find('WEAPON_') and metadata.durability then
+			if metadata.durability > 0 then TriggerClientEvent('linden_inventory:weapon', xPlayer.source, Inventories[xPlayer.source].inventory[slot])
+			else TriggerClientEvent('mythic_notify:client:SendAlert', xPlayer.source, { type = 'error', text = 'This weapon is broken' }) end
+			cb(false)
+		elseif Config.Throwable[xItem.name] then
+			TriggerClientEvent('linden_inventory:weapon', xPlayer.source, Inventories[xPlayer.source].inventory[slot])
+			cb(false)
+		elseif xItem.name:find('ammo-') then
+			TriggerClientEvent('linden_inventory:addAmmo', xPlayer.source, Inventories[xPlayer.source].inventory[slot])
+			cb(false)
+		else
+			local cItem = Config.ItemList[xItem.name]
+			if cItem then
+				if not cItem.consume or xItem.count >= cItem.consume then
+					cb(xItem)
+					if cItem.useTime then
+						ESX.SetTimeout(cItem.useTime, function()
+							removeInventoryItem(xPlayer, item, cItem.consume or 1, metadata, slot)
+						end)
+					else removeInventoryItem(xPlayer, item, cItem.consume or 1, metadata, slot) end
+				else
+					TriggerClientEvent('mythic_notify:client:SendAlert', xPlayer.source, { type = 'error', text = 'You do not have enough '..xItem.label })
+					cb(false)
+				end
+			end
+		end
 	end
 end)
 
@@ -1073,6 +1034,6 @@ end, true)
 RegisterCommand('maxweight', function(source, args, rawCommand)
 	local xPlayer = ESX.GetPlayerFromId(args[1])
 	if xPlayer then
-		setMaxWeight(xPlayer, args[2])
+		setMaxWeight(xPlayer, tonumber(args[2]))
 	end
 end, true)

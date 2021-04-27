@@ -1,4 +1,5 @@
 Config.General = {
+	name = 'Shop',
 	blip = {
 		id = 52,
 		colour = 69,
@@ -13,6 +14,7 @@ Config.General = {
 }
 
 Config.Liquor = {
+	name = 'Liquor Store',
 	blip = {
 		id = 93,
 		colour = 69,
@@ -36,6 +38,7 @@ Config.Burger = {
 }
 
 Config.YouTool = {
+	name = 'YouTool',
 	blip = {
 		id = 402,
 		colour = 69,
@@ -102,6 +105,7 @@ Config.MirrorParkWeedShop = {
 }
 
 Config.Ammunation = {
+	name = 'Ammunation',
 	blip = {
 		id = 110,
 		colour = 69,
@@ -115,6 +119,7 @@ Config.Ammunation = {
 }
 
 Config.PoliceArmoury = {
+	name = 'Police Armoury',
 	blip = {
 		id = 110,
 		colour = 84,
@@ -133,6 +138,7 @@ Config.PoliceArmoury = {
 }
 
 Config.Medicine = {
+	name = 'Medicine Cabinet',
 	blip = {
 		id = 403,
 		colour = 69,
@@ -151,15 +157,15 @@ Config.Medicine = {
 
 
 Config.Shops = {
-	{ type = Config.Ammunation, coords = vector3(-662.180, -934.961, 21.829), name = 'Ammunation', --[[currency = 'money']] }, -- can set currency like so
-	{ type = Config.Ammunation, coords = vector3(810.25, -2157.60, 29.62), name = 'Ammunation', --[[currency = 'burger']] },
-	{ type = Config.Ammunation, coords = vector3(1693.44, 3760.16, 34.71), name = 'Ammunation' },
-	{ type = Config.Ammunation, coords = vector3(-330.24, 6083.88, 31.45), name = 'Ammunation' },
-	{ type = Config.Ammunation, coords = vector3(252.63, -50.00, 69.94), name = 'Ammunation' },
-	{ type = Config.Ammunation, coords = vector3(22.56, -1109.89, 29.80), name = 'Ammunation' },
-	{ type = Config.Ammunation, coords = vector3(2567.69, 294.38, 108.73), name = 'Ammunation' },
-	{ type = Config.Ammunation, coords = vector3(-1117.58, 2698.61, 18.55), name = 'Ammunation' },
-	{ type = Config.Ammunation, coords = vector3(842.44, -1033.42, 28.19), name = 'Ammunation' },
+	{ type = Config.Ammunation, coords = vector3(-662.180, -934.961, 21.829)--[[, currency = 'money']] }, -- can set currency like so
+	{ type = Config.Ammunation, coords = vector3(810.25, -2157.60, 29.62)--[[, currency = 'burger']] },
+	{ type = Config.Ammunation, coords = vector3(1693.44, 3760.16, 34.71) },
+	{ type = Config.Ammunation, coords = vector3(-330.24, 6083.88, 31.45) },
+	{ type = Config.Ammunation, coords = vector3(252.63, -50.00, 69.94) },
+	{ type = Config.Ammunation, coords = vector3(22.56, -1109.89, 29.80) },
+	{ type = Config.Ammunation, coords = vector3(2567.69, 294.38, 108.73) },
+	{ type = Config.Ammunation, coords = vector3(-1117.58, 2698.61, 18.55) },
+	{ type = Config.Ammunation, coords = vector3(842.44, -1033.42, 28.19) },
 
 	{ type = Config.Liquor, coords = vector3(1135.808, -982.281, 46.415), name = 'Rob\'s Liquor' },
 	{ type = Config.Liquor, coords = vector3(-1222.915, -906.983,  12.326), name = 'Rob\'s Liquor' },
