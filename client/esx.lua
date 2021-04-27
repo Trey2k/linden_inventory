@@ -1,17 +1,16 @@
 ESX = nil
 TriggerEvent('esx:getSharedObject', function(obj) ESX = obj end)
-PlayerLoaded = ESX.IsPlayerLoaded()
 
 RegisterNetEvent('esx:playerLoaded')
 AddEventHandler('esx:playerLoaded', function(xPlayer)
 	PlayerLoaded = true
-	Start()
+	StartInventory()
 end)
 
 RegisterNetEvent('esx:onPlayerLogout')	-- Trigger this event when a player logs out to character selection
 AddEventHandler('esx:onPlayerLogout', function()
-	PlayerLoaded = false
 	TriggerEvent('linden_inventory:closeInventory')
+	PlayerLoaded = false
 end)
 
 AddEventHandler('esx:onPlayerDeath', function(data)

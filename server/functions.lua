@@ -1,20 +1,8 @@
-PlayerDropped = function(src)
-	local data = Opened[src]
-	if data then
-		if data.type == 'TargetPlayer' then
-			updateWeight(ESX.GetPlayerFromId(data.invid))
-			Opened[data.invid] = nil
-			print(src..' disconnected while accessing player inventory '..data.invid)
-		elseif data.type ~= 'shop' and data.type ~= 'drop' and Inventories[data.invid] and Inventories[data.invid].changed then
-			SaveItems(data.type, data.invid)
-			Inventories[data.invid].changed = false
-			print(src..' disconnected while accessing '..data.type..' '..data.invid)
-		else
-			print(src..' disconnected while accessing '..data.type..' '..data.invid)
-		end
-		Opened[src] = nil
-		if data.invid then Opened[data.invid] = nil end
-	end
+GetPlayerIdentification = function(xPlayer)
+	local sex, identifier = xPlayer.get('sex')
+	if sex == 'm' then sex = 'Male' elseif sex == 'f' then sex = 'Female' end
+	if Config.ShowIdentifierID then identifier = ' ('..xPlayer.getIdentifier()..')' else identifier = '' end
+	return ('Sex: %s | DOB: %s%s'):format( sex, xPlayer.get('dateofbirth'), identifier )
 end
 
 is_table_equal = function(t1,t2,ignore_mt)
@@ -48,7 +36,7 @@ GenerateText = function(numLetters)
 end
 
 GenerateSerial = function(text)
-	if not text then text = GenerateText(3) end
+	if not text then text = GenerateText(3) elseif string.len(text) > 3 then return text end
 	local random = math.random(100000,999999)
 	local random2 = math.random(100000,999999)
 	local serial = ('%s%s%s'):format(random, text, random2)
@@ -65,7 +53,7 @@ end
 
 setMetadata = function(metadata)
 	local data = metadata
-	if data == nil then return {}
+	if data == nil then data = {}
 	elseif type(data) == 'string' then return { type = data } end
 	return data
 end
@@ -108,25 +96,16 @@ ValidateItem = function(type, xPlayer, fromSlot, toSlot, fromItem, toItem)
 	if reason then
 		print( ('[%s] %s failed item validation (type: %s, fromSlot: %s, toSlot: %s, fromItem: %s, toItem: %s, reason: %s)'):format(xPlayer.source, GetPlayerName(xPlayer.source), type, fromSlot, toSlot, fromItem, toItem, reason) )
 		-- failed validation can be caused by desync, so don't autoban for it
+		TriggerClientEvent('mythic_notify:client:SendAlert', xPlayer.source, { type = 'error', text = '(Desync) '..reason })
 		TriggerClientEvent("linden_inventory:closeInventory", xPlayer.source)
 		TriggerClientEvent('linden_inventory:refreshInventory', xPlayer.source, Inventories[xPlayer.source])
 		return false
 	else return true end
 end 
 
-ItemNotify = function(xPlayer, item, count, slot, type, invid)
-	local xItem = Items[item]
-	local notification
-	if count > 0 then
-		notification = ('%s %sx'):format(type, count)
-		if Config.Logs then
-			-- todo
-		end
-	else notification = 'Used' end
-	if slot and type == 'Removed' and item:find('WEAPON_') then
-		slot = Inventories[xPlayer.source].inventory[slot].metadata.serial
-	else slot = nil end
-	TriggerClientEvent('linden_inventory:itemNotify', xPlayer.source, xItem, notification, slot)
+ItemNotify = function(xPlayer, item, count, slot, type)
+	local player = Inventories[xPlayer.source]
+	if Items[item.name] then TriggerClientEvent('linden_inventory:itemNotify', xPlayer.source, item, count, slot, type) end
 end
 
 SyncAccounts = function(xPlayer, name)
@@ -134,106 +113,6 @@ SyncAccounts = function(xPlayer, name)
 	account.money = getInventoryItem(xPlayer, name).count
 	xPlayer.setAccount(account)
 	xPlayer.triggerEvent('esx:setAccountMoney', account)
-end
-
-AddPlayerInventory = function(xPlayer, item, count, slot, metadata)
-	local xItem = Items[item]
-	if xPlayer and xItem and count > 0 then
-		if metadata == 'setname' then metadata = {description = xPlayer.getName()} else metadata = setMetadata(metadata) end
-		local toSlot, existing
-		if slot then slot = getPlayerSlot(xPlayer, slot, item, metadata).slot
-		else
-			for i=1, Config.PlayerSlots do
-				if xItem.stackable == 1 and Inventories[xPlayer.source].inventory[i] and Inventories[xPlayer.source].inventory[i].name == item and is_table_equal(Inventories[xPlayer.source].inventory[i].metadata, metadata) then toSlot = i existing = true break
-				elseif not toSlot and Inventories[xPlayer.source].inventory[i] == nil then toSlot = i existing = false end
-			end
-			slot = toSlot
-		end
-		if item:find('WEAPON_') then
-			xItem.stackable = false
-			if Config.Throwable[item] then
-				metadata = {throwable=1}
-				xItem.stackable = true
-			elseif Config.Melee[item] or Config.Miscellaneous[item] then
-				count = 1
-				metadata = {}
-				if not metadata.durability then metadata.durability = 100 end
-			else
-				count = 1
-				if type(metadata) ~= 'table' then metadata = {} end
-				if not metadata.durability then metadata.durability = 100 end
-				if xItem.ammoType then metadata.ammo = 0 end
-				if not metadata.components then metadata.components = {} end
-				metadata.serial = GenerateSerial(metadata.serial)
-				if metadata.registered == true then metadata.registered = xPlayer.getName() end
-			end
-			Inventories[xPlayer.source].inventory[slot] = {name = item, label = xItem.label, weight = xItem.weight, slot = slot, count = count, description = xItem.description, metadata = metadata, stackable = xItem.stackable, closeonuse = true}
-			if xItem.ammoType then Inventories[xPlayer.source].inventory[slot].ammoType = xItem.ammoType end
-			if xItem.weight > 0 or xItem.name:find('money') then updateWeight(xPlayer) end
-			ItemNotify(xPlayer, item, count, false, 'Added')
-		elseif item:find('identification') then
-			count = 1
-			metadata = {}
-			metadata.type = xPlayer.getName()
-			metadata.description = GetPlayerIdentification(xPlayer)
-			local added = count
-			if existing then count = Inventories[xPlayer.source].inventory[slot].count + count end
-			Inventories[xPlayer.source].inventory[slot] = {name = item, label = xItem.label, weight = xItem.weight, slot = slot, count = count, description = xItem.description, metadata = metadata, stackable = xItem.stackable, closeonuse = true}
-			if xItem.weight > 0 or xItem.name:find('money') then updateWeight(xPlayer) end
-			ItemNotify(xPlayer, item, added, false, 'Added')
-		elseif slot then
-			local added = count
-			if existing then count = Inventories[xPlayer.source].inventory[slot].count + count end
-			Inventories[xPlayer.source].inventory[slot] = {name = item, label = xItem.label, weight = xItem.weight, slot = slot, count = count, description = xItem.description, metadata = metadata, stackable = xItem.stackable, closeonuse = xItem.closeonuse}
-			if xItem.weight > 0 or xItem.name:find('money') then updateWeight(xPlayer) end
-			ItemNotify(xPlayer, item, added, false, 'Added')
-		end
-		if slot then TriggerClientEvent('linden_inventory:refreshInventory', xPlayer.source, Inventories[xPlayer.source]) end
-	end
-end
-
-RemovePlayerInventory = function(xPlayer, item, count, slot, metadata)
-	local xItem = Items[item]
-	if xPlayer and xItem and count > 0 then
-		metadata = setMetadata(metadata)
-		if slot and Inventories[xPlayer.source].inventory[slot].count == count then
-			Inventories[xPlayer.source].inventory[slot] = nil
-			if xItem.weight > 0 or xItem.name:find('money') then updateWeight(xPlayer) end
-			ItemNotify(xPlayer, item, count, slot, 'Removed')
-			TriggerClientEvent('linden_inventory:refreshInventory', xPlayer.source, Inventories[xPlayer.source])
-		elseif slot and Inventories[xPlayer.source].inventory[slot].count > count then
-			local newCount = Inventories[xPlayer.source].inventory[slot].count - count
-			Inventories[xPlayer.source].inventory[slot] = {name = item, label = xItem.label, weight = xItem.weight, slot = slot, count = newCount, description = xItem.description, metadata = metadata, stackable = xItem.stackable, closeonuse = xItem.closeonuse}
-			if xItem.weight > 0 or xItem.name:find('money') then updateWeight(xPlayer) end
-			ItemNotify(xPlayer, item, count, slot, 'Removed')
-			TriggerClientEvent('linden_inventory:refreshInventory', xPlayer.source, Inventories[xPlayer.source])
-		else
-			local itemSlots, totalCount = getInventoryItemSlots(xPlayer, item, metadata)
-			if itemSlots then
-				if count > totalCount then count = totalCount end
-				local removed, total = 0, count
-				for k, v in pairs(itemSlots) do -- k = slot, v = count
-					if removed < total then
-						if v == count then
-							removed = total
-							Inventories[xPlayer.source].inventory[k] = nil
-						elseif v > count then
-							removed = total
-							count = v - count
-							Inventories[xPlayer.source].inventory[k] = {name = item, label = xItem.label, weight = xItem.weight, slot = k, count = count, description = xItem.description, metadata = metadata, stackable = xItem.stackable, closeonuse = xItem.closeonuse}
-						else -- v < count
-							removed = v
-							count = count - v
-							Inventories[xPlayer.source].inventory[k] = nil
-						end
-					end
-				end
-				if xItem.weight > 0 or xItem.name:find('money') then updateWeight(xPlayer) end
-				ItemNotify(xPlayer, item, removed, false, 'Removed')
-				TriggerClientEvent('linden_inventory:refreshInventory', xPlayer.source, Inventories[xPlayer.source])
-			end
-		end
-	end
 end
 
 CreateNewDrop = function(xPlayer, data)
@@ -247,28 +126,28 @@ CreateNewDrop = function(xPlayer, data)
 		slots = Config.PlayerSlots,
 		coords = playerCoords
 	}
-	if data.type == 'swap' then
-		if ValidateItem(data.type, xPlayer, Inventories[invid2].inventory[data.fromSlot], Drops[invid].inventory[data.toSlot], data.fromItem, data.toItem) == true then
-			ItemNotify(xPlayer, data.toItem.name, data.toItem.count, data.toItem.slot, 'Removed', invid)
-			ItemNotify(xPlayer, data.fromItem.name, data.fromItem.count, false, 'Added', invid)
-			Drops[invid].inventory[data.toSlot] = {name = data.toItem.name, label = data.toItem.label, weight = data.toItem.weight, slot = data.toSlot, count = data.toItem.count, description = data.toItem.description, metadata = data.toItem.metadata, stackable = data.toItem.stackable, closeonuse = Items[data.toItem.name].closeonuse}
-			Inventories[invid2].inventory[data.fromSlot] = {name = data.fromItem.name, label = data.fromItem.label, weight = data.fromItem.weight, slot = data.fromSlot, count = data.fromItem.count, description = data.fromItem.description, metadata = data.fromItem.metadata, stackable = data.fromItem.stackable, closeonuse = Items[data.fromItem.name].closeonuse}
-		end
-	elseif data.type == 'freeslot' then
+	if data.type == 'freeslot' then
 		if ValidateItem(data.type, xPlayer, Inventories[invid2].inventory[data.emptyslot], Drops[invid].inventory[data.toSlot], data.item, data.item) == true then
 			local count = Inventories[invid2].inventory[data.emptyslot].count
-			ItemNotify(xPlayer, data.item.name, count, data.item.slot, 'Removed', invid)
+			ItemNotify(xPlayer, data.item, count, data.emptyslot, 'Removed')
 			Inventories[invid2].inventory[data.emptyslot] = nil
 			Drops[invid].inventory[data.toSlot] = {name = data.item.name, label = data.item.label, weight = data.item.weight, slot = data.toSlot, count = data.item.count, description = data.item.description, metadata = data.item.metadata, stackable = data.item.stackable, closeonuse = Items[data.item.name].closeonuse}
+			if Config.Logs then
+				exports.linden_logs:log(xPlayer, false, 'has dropped '..data.item.count..'x '..data.item.name..' in drop-'..invid, 'items')
+			end
+			TriggerClientEvent('linden_inventory:createDrop', -1, Drops[invid], xPlayer.source)
 		end
 	elseif data.type == 'split' then
 		if ValidateItem(data.type, xPlayer, Inventories[invid2].inventory[data.fromSlot], Drops[invid].inventory[data.toSlot], data.oldslotItem, data.newslotItem) == true then
-			ItemNotify(xPlayer, data.newslotItem.name, data.newslotItem.count, data.newslotItem.slot, 'Removed', invid)
+			ItemNotify(xPlayer, data.newslotItem, data.newslotItem.count, data.fromSlot, 'Removed')
 			Inventories[invid2].inventory[data.fromSlot] = {name = data.oldslotItem.name, label = data.oldslotItem.label, weight = data.oldslotItem.weight, slot = data.fromSlot, count = data.oldslotItem.count, description = data.oldslotItem.description, metadata = data.oldslotItem.metadata, stackable = data.oldslotItem.stackable, closeonuse = Items[data.oldslotItem.name].closeonuse}
 			Drops[invid].inventory[data.toSlot] = {name = data.newslotItem.name, label = data.newslotItem.label, weight = data.newslotItem.weight, slot = data.toSlot, count = data.newslotItem.count, description = data.newslotItem.description, metadata = data.newslotItem.metadata, stackable = data.newslotItem.stackable, closeonuse = Items[data.newslotItem.name].closeonuse}
+			if Config.Logs then
+				exports.linden_logs:log(xPlayer, false, 'has dropped '..data.newslotItem.count..'x '..data.newslotItem.name,' in drop-'..invid, 'items')
+			end
+			TriggerClientEvent('linden_inventory:createDrop', -1, Drops[invid], xPlayer.source)
 		end
 	end
-	TriggerClientEvent('linden_inventory:createDrop', -1, Drops[invid], xPlayer.source)
 end
 
 local randomPrice = function(price)
@@ -301,33 +180,132 @@ SetupShopItems = function(shop)
 	return inventory
 end
 
-SaveItems = function(type,id)
-	if id and (type == 'stash' or type == 'trunk' or type == 'glovebox') then
-		local inventory = json.encode(getInventory(Inventories[id]))
-		local result = exports.ghmattimysql:scalarSync('SELECT data FROM linden_inventory WHERE name = @name', {
-			['@name'] = id
-		})
-		if result then
-			if result ~= inventory then
-				exports.ghmattimysql:execute('UPDATE linden_inventory SET data = @data WHERE name = @name', {
-					['@data'] = inventory,
+---	delete all vehicles from `linden_inventory` table where name exists more than once and owner is null (temporary)
+RegisterCommand('cleanvehicles', function(source, args, rawCommand)
+	if source > 0 then return end
+	
+	local result = exports.ghmattimysql:executeSync('SELECT name, owner FROM linden_inventory group by name having count(*) >= 2', {})
+	if result then
+		for k,v in pairs(result) do
+			exports.ghmattimysql:scalarSync('DELETE FROM linden_inventory WHERE owner IS NULL AND name = @name', {['@name'] = v.name})
+		end
+	end
+
+end, true)
+---
+SaveItems = function(type,id,owner)
+	if id and owner == nil and (type == 'stash' or type == 'trunk' or type == 'glovebox') then
+		if type ~= 'stash' then
+			local plate = string.match(id, "-(.*)")
+			local owner
+			if Datastore[plate] then owner = false else
+				local result = exports.ghmattimysql:scalarSync('SELECT owner FROM owned_vehicles WHERE plate = @plate', {
+					['@plate'] = plate
+				})
+				if result then owner = result end
+			end
+			if not owner then
+				if not Datastore[plate] then Datastore[plate] = {trunk = {}, glovebox = {}} end
+				Datastore[plate][type] = Inventories[id].inventory
+				return
+			else
+				local inventory = json.encode(getInventory(Inventories[id]))
+				local result = exports.ghmattimysql:executeSync('SELECT * FROM linden_inventory WHERE name = @name LIMIT 1', {
 					['@name'] = id
+				})
+				if result[1] then
+					if result[1].data ~= inventory then
+						exports.ghmattimysql:execute('UPDATE linden_inventory SET data = @data, owner = @owner WHERE id = @id', {
+							['@id'] = result[1].id,
+							['@owner'] = owner,
+							['@data'] = inventory
+						})
+					end
+				elseif inventory ~= '[]' then
+					exports.ghmattimysql:execute('INSERT INTO linden_inventory (name, data, owner) VALUES (@name, @data, @owner)', {
+						['@name'] = id,
+						['@data'] = inventory,
+						['@owner'] = owner
+					})
+				end
+			end
+		else	-- Unowned stash
+			local inventory = json.encode(getInventory(Inventories[id]))
+			local result = exports.ghmattimysql:scalarSync('SELECT data FROM linden_inventory WHERE name = @name', {
+				['@name'] = id
+			})
+			if result then
+				if result ~= inventory then
+					exports.ghmattimysql:execute('UPDATE linden_inventory SET data = @data WHERE name = @name', {
+						['@data'] = inventory,
+						['@name'] = id
+					})
+				end
+			elseif inventory ~= '[]' then
+				exports.ghmattimysql:execute('INSERT INTO linden_inventory (name, data) VALUES (@name, @data)', {
+					['@name'] = id,
+					['@data'] = inventory
+				})
+			end
+		end
+	elseif id and owner then
+		local inventory = json.encode(getInventory(Inventories[id]))
+		local result = exports.ghmattimysql:executeSync('SELECT * FROM linden_inventory WHERE name = @name AND owner = @owner LIMIT 1', {
+			['@name'] = id,
+			['@owner'] = owner
+		})
+		if result[1] then
+			if result[1].data ~= inventory then
+				exports.ghmattimysql:execute('UPDATE linden_inventory SET data = @data WHERE id = @id', {
+					['@id'] = result[1].id,
+					['@data'] = inventory,
 				})
 			end
 		elseif inventory ~= '[]' then
-			exports.ghmattimysql:execute('INSERT INTO linden_inventory (name, data) VALUES (@name, @data)', {
+			exports.ghmattimysql:execute('INSERT INTO linden_inventory (name, data, owner) VALUES (@name, @data, @owner)', {
 				['@name'] = id,
-				['@data'] = inventory
+				['@data'] = inventory,
+				['@owner'] = owner
 			})
 		end
 	end
 end
 
-GetItems = function(id)
+GetItems = function(id, type, owner)
 	local returnData = {}
-	local result = exports.ghmattimysql:scalarSync('SELECT data FROM linden_inventory WHERE name = @name', {
-		['@name'] = id
-	})
+	local result
+	if not owner then
+		if type == 'trunk' or type == 'glovebox' then
+			local plate = string.match(id, "-(.*)")
+			local result = exports.ghmattimysql:scalarSync('SELECT plate, owner FROM owned_vehicles WHERE plate = @plate', {
+				['@plate'] = plate
+			})
+			if result == nil then
+				if not Datastore[plate] then
+					Datastore[plate] = {trunk = {}, glovebox = {}}
+					--- Temporary! Clean up vehicles with no owners
+					local result = exports.ghmattimysql:scalarSync('SELECT id FROM linden_inventory WHERE name = @name', {
+						['@name'] = id
+					})
+					if result then
+						exports.ghmattimysql:scalarSync('DELETE FROM linden_inventory WHERE id = @id', {
+							['@id'] = result
+						})
+					end
+					----------------------------------------------
+				end
+				return Datastore[plate][type]
+			end
+		end
+		result = exports.ghmattimysql:scalarSync('SELECT data FROM linden_inventory WHERE name = @name', {
+			['@name'] = id
+		})
+	else
+		result = exports.ghmattimysql:scalarSync('SELECT data FROM linden_inventory WHERE name = @name AND owner = @owner', {
+			['@name'] = id,
+			['@owner'] = owner
+		})
+	end
 	if result ~= nil then
 		local Inventory = json.decode(result)
 		for k,v in pairs(Inventory) do
@@ -350,10 +328,6 @@ CheckOpenable = function(xPlayer, id, coords)
 	return false
 end
 
-GetPlayerIdentification = function(xPlayer)
-	return ('Sex: %s | DOB: %s (%s)'):format( xPlayer.get('sex'), xPlayer.get('dateofbirth'), xPlayer.getIdentifier() )
-end
-
 ValidateString = function(item)
 	item = string.lower(item)
 	if item:find('weapon_') then item = string.upper(item) end
@@ -367,6 +341,7 @@ UseItem = function(xPlayer, item, notESX)
 		TriggerClientEvent('linden_inventory:useItem', xPlayer.source, item)
 	else
 		if type(item) == 'table' then item = item.name end
-	 	if ESX.UsableItemsCallbacks[item] then TriggerEvent('esx:useItem', xPlayer.source, item) end
+		TriggerClientEvent('linden_inventory:closeInventory', xPlayer.source)
+		ESX.UseItem(xPlayer.source, item)
 	end
 end
