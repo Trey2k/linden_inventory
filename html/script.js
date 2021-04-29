@@ -481,7 +481,7 @@ $(document).on('click', '.close', function(e){
 });
 
 is_table_equal = function(obj1, obj2) {
-	if (obj1 == null && obj2 == null){
+	if (obj1 == undefined && obj2 == undefined){
 		return true
 	} else if (obj1 == null || obj2 == null){
 		return false
