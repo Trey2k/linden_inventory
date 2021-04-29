@@ -37,6 +37,19 @@ Config.Burger = {
 	}
 }
 
+Config.Hunting = {
+	blip = {
+		id = 119,
+		colour = 69,
+		scale = 1
+	}, inventory = {
+		{ name = 'ammo-musket', price = 25, },
+		{ name = 'burger', price = 10 },
+		{ name = 'water', price = 10 },
+		{ name = 'WEAPON_MUSKET', price = 2000, metadata = { registered = true }, license = 'weapon' },
+	}
+}
+
 Config.YouTool = {
 	name = 'YouTool',
 	blip = {
@@ -182,11 +195,12 @@ Config.Shops = {
 
 	---------------------------- OUR SHOPS ADDED ------------------------------------------------------
 
-	{ type = Config.Nail, coords = vector3(225.12, -1544.4, 29.29), name = 'Nail Salon' },  -- the nail salon in the south side addon 
-	{ type = Config.SmokeOnTheWater, coords = vector3(-1172.3, -1571.92, 4.65), name = 'Smoke on the water' }, -- smoke on the water vespuchie beach  -- has bulk weed sales in back 
-	{ type = Config.MirrorParkWeedShop, coords = vector3(1175.25, -437.26, 66.90), name = 'Mirror Park dispensary' }, -- mirror park dispensary		-- has bulk weed sales in back 
-	{ type = Config.StockMarket, coords = vector3(232.18, -1095, 29.29), name = 'Stock Market' }, -- stock market shop 
-	{ type = Config.Burger, coords = vector3(-1193.19, -893.63, 13.9), name = 'Burger Shot' },
+	{ type = Config.Nail, coords = vector3(225.12, -1544.4, 29.29), name = 'Nail Salon' },  							-- the nail salon in the south side addon 
+	{ type = Config.SmokeOnTheWater, coords = vector3(-1172.3, -1571.92, 4.65), name = 'Smoke on the water' }, 			-- smoke on the water vespuchie beach  -- has bulk weed sales in back 
+	{ type = Config.MirrorParkWeedShop, coords = vector3(1175.25, -437.26, 66.90), name = 'Mirror Park dispensary' }, 	-- mirror park dispensary		-- has bulk weed sales in back 
+	{ type = Config.StockMarket, coords = vector3(232.18, -1095, 29.29), name = 'Stock Market' },						-- stock market shop 
+	{ type = Config.Burger, coords = vector3(-1193.19, -893.63, 13.9), name = 'Burger Shot' }, 							-- burger shot
+	{ type = Config.Hunting, coords = vector3(-774.18, 5602.75, 33.54), name = 'Hunting Shop' }, 						-- huning shop near paleto sells hunting rifles 
 
 
 	------------------- gas stations and 24/7's ------------------------------------------------------------
