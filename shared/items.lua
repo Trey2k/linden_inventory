@@ -173,10 +173,7 @@ Config.ItemList = {
 	},
 
 	['lockpick'] = {
-		disableMove = true,
-		animDict = 'anim@amb@clubhouse@tutorial@bkr_tut_ig3@',
-		anim = 'machinic_loop_mechandplayer',
-		useTime = 2000,
+		useTime = 0,
 		consume = 0,
 		dofirst = 'esx_lockpick:onUse'
 	},
