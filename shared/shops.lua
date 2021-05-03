@@ -61,8 +61,13 @@ Config.YouTool = {
 		{ name = 'repairkit', price = 1500 },
 		{ name = 'radio', price = 150 },
 		{ name = 'tongs', price = 150 },
-		{ name = 'steel_pickaxe', price = 450, metadata={type= '300'} },
-		{ name = 'titanium_pickaxe', price = 1450, metadata={type= '600'} },
+		{ name = 'drain_cleaner', price = 20, metadata={type= '10% Hydrocloric Acid'} },
+		{ name = 'steel_pickaxe', price = 350, metadata={type= '300'} },
+		{ name = 'titanium_pickaxe', price = 1250, metadata={type= '600'} },
+		{ name = 'axe_steel', price = 350 },
+		{ name = 'axe_titanium', price = 1250 },
+
+		
 	}
 }
 
@@ -70,9 +75,26 @@ Config.Nail = {
 	blip = {
 		id = 121,
 		colour = 69,
-		scale = 0.9
+		scale = 0.7
 	}, inventory = {
 		{ name = 'acetone', price = 75 },
+		{ name = 'hydrogen_peroxide450ml', price = 15 },
+
+		
+	}
+}
+
+Config.DollaPills = {
+	blip = {
+		id = 51,
+		colour = 48,
+		scale = 0.7
+	}, inventory = {
+		{ name = 'acetone', price = 75, metadata={type= '95% Acetone'} },
+		{ name = 'pseudoephedrine_pills_10mg', price = 300 },
+		{ name = 'hydrocloric_acid_500lm', price = 30, metadata={type= '20% Hydrocloric acid'} },
+		{ name = 'dextrose', price = 30, metadata={type= '50% Dextrose Solution'} },
+		{ name = 'benzaldehyde_1L', price = 30 },
 	}
 }
 
@@ -127,6 +149,9 @@ Config.Ammunation = {
 		{ name = 'ammo-9', price = 5, },
 		{ name = 'WEAPON_KNIFE', price = 200 },
 		{ name = 'WEAPON_BAT', price = 100 },
+		{ name = 'plate_steel', price = 125 },
+		{ name = 'plate_titanium', price = 250 },
+		{ name = 'plate_carrier', price = 175 },
 		{ name = 'WEAPON_PISTOL', price = 1000, metadata = { registered = true }, license = 'weapon' },
 	}
 }
@@ -201,6 +226,16 @@ Config.Shops = {
 	{ type = Config.StockMarket, coords = vector3(232.18, -1095, 29.29), name = 'Stock Market' },						-- stock market shop 
 	{ type = Config.Burger, coords = vector3(-1193.19, -893.63, 13.9), name = 'Burger Shot' }, 							-- burger shot
 	{ type = Config.Hunting, coords = vector3(-774.18, 5602.75, 33.54), name = 'Hunting Shop' }, 						-- huning shop near paleto sells hunting rifles 
+
+
+
+	--- dolla pills
+
+	{ type = Config.DollaPills, coords = vector3(68.72, -1569.75, 29.5), name = 'Dolla Pills' },
+	{ type = Config.DollaPills, coords = vector3(591.23, 2743.9, 42.04), name = 'Dolla Pills' },
+	{ type = Config.DollaPills, coords = vector3(98.42, -225.3, 54.64), name = 'Dolla Pills' },
+	{ type = Config.DollaPills, coords = vector3(-774.18, 5602.75, 343.54), name = 'Dolla Pills' },
+
 
 
 	------------------- gas stations and 24/7's ------------------------------------------------------------
