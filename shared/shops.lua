@@ -60,6 +60,7 @@ Config.YouTool = {
 		{ name = 'lockpick', price = 40 },
 		{ name = 'repairkit', price = 1500 },
 		{ name = 'radio', price = 150 },
+		{ name = 'matches', price = 8 },
 		{ name = 'tongs', price = 150 },
 		{ name = 'drain_cleaner', price = 20, metadata={type= '10% Hydrocloric Acid'} },
 		{ name = 'steel_pickaxe', price = 350, metadata={type= '300'} },
@@ -149,10 +150,12 @@ Config.Ammunation = {
 		{ name = 'ammo-9', price = 5, },
 		{ name = 'WEAPON_KNIFE', price = 200 },
 		{ name = 'WEAPON_BAT', price = 100 },
-		{ name = 'plate_steel', price = 125 },
-		{ name = 'plate_titanium', price = 250 },
+		{ name = 'plate_steel', price = 50 },
+		{ name = 'plate_titanium', price = 100 },
 		{ name = 'plate_carrier', price = 175 },
 		{ name = 'WEAPON_PISTOL', price = 1000, metadata = { registered = true }, license = 'weapon' },
+		{ name = 'WEAPON_PISTOL_MK2', price = 1250, metadata = { registered = true }, license = 'weapon' },
+		
 	}
 }
 
@@ -168,6 +171,9 @@ Config.PoliceArmoury = {
 		{ name = 'repairkit', price = 1500 },
 		{ name = 'WEAPON_FLASHLIGHT', price = 200 },
 		{ name = 'radio', price = 150 },
+		{ name = 'plate_steel', price = 40 },
+		{ name = 'plate_titanium', price = 80 },
+		{ name = 'plate_carrier', price = 125 },
 		{ name = 'WEAPON_NIGHTSTICK', price = 100 },
 		{ name = 'WEAPON_PISTOL', price = 500, metadata = { registered = true, serial = 'POL' }, license = 'weapon' },
 		{ name = 'WEAPON_CARBINERIFLE', price = 1000, metadata = { registered = true, serial = 'POL' }, license = 'weapon', grade = 3 },
@@ -228,13 +234,12 @@ Config.Shops = {
 	{ type = Config.Hunting, coords = vector3(-774.18, 5602.75, 33.54), name = 'Hunting Shop' }, 						-- huning shop near paleto sells hunting rifles 
 
 
+	---- dolla pills
 
-	--- dolla pills
-
-	{ type = Config.DollaPills, coords = vector3(68.72, -1569.75, 29.5), name = 'Dolla Pills' },
-	{ type = Config.DollaPills, coords = vector3(591.23, 2743.9, 42.04), name = 'Dolla Pills' },
-	{ type = Config.DollaPills, coords = vector3(98.42, -225.3, 54.64), name = 'Dolla Pills' },
-	{ type = Config.DollaPills, coords = vector3(-774.18, 5602.75, 343.54), name = 'Dolla Pills' },
+	{ type = Config.DollaPills, coords = vector3(68.72, -1569.75, 29.5), name = 'Dolla Pills' },            			-- dolla pills
+	{ type = Config.DollaPills, coords = vector3(591.23, 2743.9, 42.04), name = 'Dolla Pills' },						-- dolla pills
+	{ type = Config.DollaPills, coords = vector3(98.42, -225.3, 54.64), name = 'Dolla Pills' },							-- dolla pills
+	
 
 
 
