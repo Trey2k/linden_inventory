@@ -41,11 +41,12 @@ Config.Hunting = {
 	blip = {
 		id = 119,
 		colour = 69,
-		scale = 1
+		scale = 0.9
 	}, inventory = {
 		{ name = 'ammo-musket', price = 25, },
-		{ name = 'burger', price = 10 },
-		{ name = 'water', price = 10 },
+		{ name = 'WEAPON_KNIFE', price = 150 },
+		{ name = 'axe_steel', price = 350 },
+		{ name = 'axe_titanium', price = 1250 },
 		{ name = 'WEAPON_MUSKET', price = 2000, metadata = { registered = true }, license = 'weapon' },
 	}
 }
