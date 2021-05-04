@@ -124,7 +124,8 @@ CreateNewDrop = function(xPlayer, data)
 		name = invid,
 		inventory = {},
 		slots = Config.PlayerSlots,
-		coords = playerCoords
+		coords = playerCoords,
+		type = 'drop'
 	}
 	if data.type == 'freeslot' then
 		if ValidateItem(data.type, xPlayer, Inventories[invid2].inventory[data.emptyslot], Drops[invid].inventory[data.toSlot], data.item, data.item) == true then
@@ -311,8 +312,10 @@ GetItems = function(id, type, owner)
 	if result ~= nil then
 		local Inventory = json.decode(result)
 		for k,v in pairs(Inventory) do
-			if v.metadata == nil then v.metadata = {} end
-			returnData[v.slot] = {name = v.name ,label = Items[v.name].label, weight = Items[v.name].weight, slot = v.slot, count = v.count, description = Items[v.name].description, metadata = v.metadata, stackable = Items[v.name].stackable}
+			if Items[v.name] then
+				if v.metadata == nil then v.metadata = {} end
+				returnData[v.slot] = {name = v.name , label = Items[v.name].label, weight = Items[v.name].weight, slot = v.slot, count = v.count, description = Items[v.name].description, metadata = v.metadata, stackable = Items[v.name].stackable}
+			end
 		end
 	end
 	return returnData

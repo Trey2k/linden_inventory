@@ -61,7 +61,11 @@ exports.ghmattimysql:ready(function()
 					closeonuse = v.closeonuse
 				}
 				if ESX.UsableItemsCallbacks[v.name] ~= nil and not Config.ItemList[v.name] then Usables[v.name] = true end
-				if v.name:find('WEAPON') then local AmmoType = GetAmmoType(v.name) if AmmoType then Items[v.name].ammoType = AmmoType end end
+				if v.name:find('WEAPON') then
+					local AmmoType = GetAmmoType(v.name)
+					if AmmoType then Items[v.name].ammoType = AmmoType
+					end
+				end
 			end
 			message('Created '..#(result)..' items', 2)
 			Status[1] = 'loaded'
@@ -107,8 +111,6 @@ ESX.RegisterServerCallback('linden_inventory:setup', function(source, cb)
 		if result ~= nil then
 			TriggerEvent('linden_inventory:setPlayerInventory', xPlayer, json.decode(result))
 			while xPlayer.get('linventory') ~= true do Citizen.Wait(100) end
-		else
-			DropPlayer(xPlayer.source, 'there was an issue loading your inventory')
 		end
 	end
 	Inventories[xPlayer.source].name = xPlayer.getName()
@@ -258,52 +260,52 @@ AddEventHandler('linden_inventory:openInventory', function(data, player)
 		elseif data.type == 'shop' then
 			local id = data.id
 			local shop = Config.Shops[id]
-			Shops[id] = {
-				id = id,
-				type = 'shop',
-				name = shop.name or shop.type.name,
-				coords = shop.coords,
-				job = shop.job,
-				inventory = SetupShopItems(id),
-				slots = #shop.store.inventory,
-				currency = shop.currency
-			}
 			if (not Shops[id].job or Shops[id].job == xPlayer.job.name) then
 				local srcCoords = GetEntityCoords(GetPlayerPed(xPlayer.source))
 				if #(shop.coords - srcCoords) <= 2 then
+					Shops[id] = {
+						id = id,
+						type = 'shop',
+						name = shop.name or shop.type.name,
+						coords = shop.coords,
+						job = shop.job,
+						inventory = SetupShopItems(id),
+						slots = #shop.store.inventory,
+						currency = shop.currency
+					}
 					Opened[xPlayer.source] = {invid = xPlayer.source, type = 'Playerinv'}
 					TriggerClientEvent('linden_inventory:openInventory', xPlayer.source, Inventories[xPlayer.source], Shops[id])
 				end
 			end
 		elseif data.type == 'glovebox' or data.type == 'trunk' or (data.type == 'stash' and not data.owner) then
 			local id = data.id
-			if not data.maxWeight then data.maxWeight = data.slots*8000 end
-			Inventories[id] = {
-				name = id,
-				type = data.type,
-				slots = data.slots,
-				coords = data.coords,
-				maxWeight = data.maxWeight,
-				inventory = GetItems(id, data.type)
-			}
 			if CheckOpenable(xPlayer, id, data.coords) then
+				if not data.maxWeight then data.maxWeight = data.slots*8000 end
+				Inventories[id] = {
+					name = id,
+					type = data.type,
+					slots = data.slots,
+					coords = data.coords,
+					maxWeight = data.maxWeight,
+					inventory = GetItems(id, data.type)
+				}
 				Opened[xPlayer.source] = {invid = id, type = data.type}
 				TriggerClientEvent('linden_inventory:openInventory', xPlayer.source, Inventories[xPlayer.source], Inventories[id])
 			end
 		elseif data.owner then
 			if data.owner == true then data.owner = xPlayer.identifier end
 			local id = data.id..'-'..data.owner
-			if not data.maxWeight then data.maxWeight = data.slots*8000 end
-			Inventories[id] = {
-				name = id,
-				owner = data.owner,
-				type = data.type,
-				slots = data.slots,
-				coords = data.coords,
-				maxWeight = data.maxWeight,
-				inventory = GetItems(id, data.type, data.owner)
-			}
 			if CheckOpenable(xPlayer, id, data.coords) then
+				if not data.maxWeight then data.maxWeight = data.slots*8000 end
+				Inventories[id] = {
+					name = id,
+					owner = data.owner,
+					type = data.type,
+					slots = data.slots,
+					coords = data.coords,
+					maxWeight = data.maxWeight,
+					inventory = GetItems(id, data.type, data.owner)
+				}
 				Opened[xPlayer.source] = {invid = id, type = data.type}
 				TriggerClientEvent('linden_inventory:openInventory', xPlayer.source, Inventories[xPlayer.source], Inventories[id])
 			end
@@ -430,7 +432,7 @@ AddEventHandler('linden_inventory:saveInventoryData', function(data)
 			else
 				invid = data.invid
 			end
-			if data.frominv == nil or data.frominv == 'drop' or data.toinv == 'drop' then
+			if data.frominv == 'drop' or data.toinv == 'drop' then
 				if data.type == 'swap' then
 					if ValidateItem(data.type, xPlayer, Drops[invid].inventory[data.fromSlot], Drops[invid].inventory[data.toSlot], data.fromItem, data.toItem) == true then
 						Drops[invid].inventory[data.toSlot] = {name = data.toItem.name, label = data.toItem.label, weight = data.toItem.weight, slot = data.toSlot, count = data.toItem.count, description = data.toItem.description, metadata = data.toItem.metadata, stackable = data.toItem.stackable, closeonuse = Items[data.toItem.name].closeonuse}
@@ -492,7 +494,7 @@ AddEventHandler('linden_inventory:saveInventoryData', function(data)
 				end
 				invid = xPlayer.source
 			end
-			if data.frominv == nil or data.frominv == 'drop' or data.toinv == 'drop' then
+			if data.frominv == 'drop' or data.toinv == 'drop' then
 				local dropid
 				if data.frominv == 'Playerinv' then
 					dropid = invid
@@ -676,22 +678,24 @@ end)
 RegisterNetEvent('linden_inventory:saveInventory')
 AddEventHandler('linden_inventory:saveInventory', function(data)
 	local src = source
+	local invid
+	local xPlayer = ESX.GetPlayerFromId(src)
 	if Inventories[src] then
-		local xPlayer = ESX.GetPlayerFromId(src)
 		if data.type == 'TargetPlayer' then
-			local invid = Opened[src].invid
+			invid = Opened[src].invid
 			updateWeight(ESX.GetPlayerFromId(invid))
-			Opened[invid] = nil
 		elseif data.type ~= 'shop' and data.type ~= 'drop' and Inventories[data.invid] then
+			invid = data.invid
 			if Inventories[data.invid].changed then	SaveItems(data.type, data.invid, Inventories[data.invid].owner) end
 			Inventories[data.invid] = nil
-			Opened[data.invid] = nil
-		elseif data.invid then Opened[data.invid] = nil end
+		elseif data.type == 'drop' then invid = data.invid end
+		Citizen.Wait(50)
 		if xPlayer then
-			Opened[src] = nil
 			updateWeight(xPlayer)
 			TriggerClientEvent('linden_inventory:refreshInventory', src, Inventories[src])
 		end
+		if invid then Opened[invid] = nil end
+		Opened[src] = nil
 	end
 end)
 
@@ -713,7 +717,7 @@ end)
 AddEventHandler('playerDropped', function(reason)
 	local playerid = source
 	if Inventories[playerid] then
-		ESX.SetTimeout(2000, function()	
+		ESX.SetTimeout(30000, function()	
 			Inventories[playerid] = nil
 		end)
 	end
@@ -727,6 +731,16 @@ AddEventHandler('linden_inventory:devtool', function()
 			exports.linden_logs:log(xPlayer, false, 'kicked for opening nui_devtools', 'kick')
 		end
 		DropPlayer(source, 'foxtrot-uniform-charlie-kilo')
+	end
+end)
+
+RegisterNetEvent('linden_inventory:weaponMismatch')
+AddEventHandler('linden_inventory:weaponMismatch', function(hash)
+	local xPlayer = ESX.GetPlayerFromId(source)
+	local weapon = ESX.GetWeaponFromHash(hash).name
+	if not Items[weapon] then TriggerBanEvent(xPlayer, 'using a '..weapon..' but item is invalid')
+	elseif xPlayer.getInventoryItem(weapon).count < 1 then
+		TriggerBanEvent(xPlayer, 'using a '..weapon..' but does not have any')
 	end
 end)
 
