@@ -45,8 +45,7 @@ Config.Hunting = {
 	}, inventory = {
 		{ name = 'ammo-musket', price = 25, },
 		{ name = 'WEAPON_KNIFE', price = 150 },
-		{ name = 'axe_steel', price = 350 },
-		{ name = 'axe_titanium', price = 1250 },
+		{ name = 'WEAPON_HATCHET', price = 200 },
 		{ name = 'WEAPON_MUSKET', price = 2000, metadata = { registered = true }, license = 'weapon' },
 	}
 }
@@ -67,7 +66,7 @@ Config.YouTool = {
 		{ name = 'steel_pickaxe', price = 350, metadata={type= '300'} },
 		{ name = 'titanium_pickaxe', price = 1250, metadata={type= '600'} },
 		{ name = 'WEAPON_HATCHET', price = 200 },
-		{ name = 'axe_titanium', price = 1250 },
+		
 
 		
 	}
