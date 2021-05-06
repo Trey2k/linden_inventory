@@ -66,7 +66,7 @@ Config.YouTool = {
 		{ name = 'drain_cleaner', price = 20, metadata={type= '10% Hydrocloric Acid'} },
 		{ name = 'steel_pickaxe', price = 350, metadata={type= '300'} },
 		{ name = 'titanium_pickaxe', price = 1250, metadata={type= '600'} },
-		{ name = 'axe_steel', price = 350 },
+		{ name = 'WEAPON_HATCHET', price = 200 },
 		{ name = 'axe_titanium', price = 1250 },
 
 		
@@ -197,10 +197,6 @@ Config.Medicine = {
 	}
 }
 
- 
-
-
-
 Config.Shops = {
 	{ type = Config.Ammunation, coords = vector3(-662.180, -934.961, 21.829)--[[, currency = 'money']] }, -- can set currency like so
 	{ type = Config.Ammunation, coords = vector3(810.25, -2157.60, 29.62)--[[, currency = 'burger']] },
@@ -223,7 +219,6 @@ Config.Shops = {
 	{ type = Config.YouTool, coords = vector3(45.72, -1748.88, 29.65), name = 'YouTool' },
 	{ type = Config.YouTool, coords = vector3(2748.0, 3473.0, 55.67), name = 'YouTool' },
 	{ type = Config.YouTool, coords = vector3(342.99, -1298.26, 32.51), name = 'YouTool' }, 
-
 
 	---------------------------- OUR SHOPS ADDED ------------------------------------------------------
 
