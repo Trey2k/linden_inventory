@@ -120,6 +120,22 @@ ESX.RegisterServerCallback('linden_inventory:setup', function(source, cb)
 	updateWeight(xPlayer, true)	
 end)
 
+--[[
+CUSTOM START
+]]--
+
+RegisterNetEvent('linden_inventory:modifyArmor')
+AddEventHandler('linden_inventory:modifyArmor', function(item, amount)
+	local xPlayer = ESX.GetPlayerFromId(source)
+	if Inventories[xPlayer.source].inventory[item.slot] ~= nil then
+	   	Inventories[xPlayer.source].inventory[item.slot].metadata.armor = amount
+	end
+end)
+
+--[[
+CUSTOM END
+]]--
+
 AddEventHandler('onResourceStart', function(resourceName)
 	if (GetCurrentResourceName() == resourceName) then
 		if ESX == nil then return end

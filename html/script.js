@@ -451,6 +451,9 @@ $(document).on("mouseenter", ".ItemBoxes", function(e){
 				if (Item.metadata.components) { $(".iteminfo-description").append('<p>Components: '+Item.metadata.components+'</p>')}
 				if (Item.metadata.weapontint) { $(".iteminfo-description").append('<p>Tint: '+Item.metadata.weapontint+'</p>')}
 			}
+			if (Item.name == "plate_carrier" && Item.metadata.armor !== undefined) {
+				if (Item.metadata.armor !== undefined) { $(".iteminfo-description").append('<p>Armor: '+parseInt(Item.metadata.armor).toFixed(0)+''+'%</p>') }
+			}
 		}
 	} else {
 		$(".iteminfo").fadeOut(100);

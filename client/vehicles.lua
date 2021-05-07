@@ -67,7 +67,7 @@ Config.Trunks = {
 	[8] = {10,  20000},-- motorcycle
 	[9] = {25, 200000}, -- offroad
 	[10] = {25, 300000}, -- industrial
-	[11] = {25, 200000}, -- utility
+	[11] = {25, 200000}, -- offroad
 	[12] = {25, 100000}, -- van
 	--[14] -- boat
 	--[15] -- helicopter 

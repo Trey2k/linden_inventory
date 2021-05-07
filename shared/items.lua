@@ -196,4 +196,16 @@ Config.ItemList = {
 		serverEvent = 'weasel-heist:useDongle'
 	},
 
+	['plate_steel'] = {
+		useTime = 5000,
+		consume = 1,
+		event = 'weasel-armor:usePlateSteel'
+	},
+
+	['plate_titanium'] = {
+		useTime = 5000,
+		consume = 1,
+		event = 'weasel-armor:usePlateTitanium'
+	},
+	
 }
