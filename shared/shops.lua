@@ -63,8 +63,7 @@ Config.YouTool = {
 		{ name = 'matches', price = 8 },
 		{ name = 'tongs', price = 150 },
 		{ name = 'drain_cleaner', price = 20, metadata={type= '10% Hydrocloric Acid'} },
-		{ name = 'steel_pickaxe', price = 350, metadata={type= '300'} },
-		{ name = 'titanium_pickaxe', price = 1250, metadata={type= '600'} },
+		{ name = 'steel_pickaxe', price = 500, metadata={type= '300'} },
 		{ name = 'WEAPON_HATCHET', price = 200 },
 		
 
