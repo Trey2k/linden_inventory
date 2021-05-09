@@ -15,20 +15,20 @@ ClearWeapons = function()
 end
 
 DisarmPlayer = function(weapon)
-	currentWeapon.metadata.ammo = GetAmmoInPedWeapon(playerPed, currentWeapon.hash)
-	SetPedAmmo(playerPed, currentWeapon.hash, 0)
-	SetCurrentPedWeapon(playerPed, `WEAPON_UNARMED`, true)
-	RemoveWeaponFromPed(playerPed, currentWeapon.hash)
-	TriggerServerEvent('linden_inventory:updateWeapon', currentWeapon)
-	TriggerEvent('linden_inventory:currentWeapon', nil)
-end
-
-error = function(msg)
-	TriggerEvent('mythic_notify:client:SendAlert', {type = 'error', text = msg, length = 2500})
-end
-
-inform = function(msg)
-	TriggerEvent('mythic_notify:client:SendAlert', {type = 'inform', text = msg, length = 2500})
+	if currentWeapon then
+		currentWeapon.metadata.ammo = GetAmmoInPedWeapon(playerPed, currentWeapon.hash)
+		SetPedAmmo(playerPed, currentWeapon.hash, 0)
+		SetCurrentPedWeapon(playerPed, `WEAPON_UNARMED`, true)
+		RemoveWeaponFromPed(playerPed, currentWeapon.hash)
+		if currentWeapon.metadata.components then
+			for k,v in pairs(currentWeapon.metadata.components) do
+				local componentHash = ESX.GetWeaponComponent(currentWeapon.name, v).hash
+				if componentHash then RemoveWeaponComponentFromPed(playerPed, currentWeapon.hash, componentHash) end
+			end
+		end
+		TriggerServerEvent('linden_inventory:updateWeapon', currentWeapon)
+		TriggerEvent('linden_inventory:currentWeapon', nil)
+	end
 end
 
 StartInventory = function()
@@ -45,7 +45,7 @@ StartInventory = function()
 		inventoryLabel = playerName..' ['..playerID..'] '--[[..ESX.PlayerData.job.grade_label]]
 		PlayerLoaded = true
 		ClearWeapons()
-		inform("Inventory is ready to use")
+		TriggerEvent('mythic_notify:client:SendAlert', {type = 'inform', text = _U('inventory_setup'), length = 2500})
 		TriggerLoops()
 		if next(Blips) then
 			for k, v in pairs(Blips) do
@@ -94,10 +94,10 @@ OpenTargetInventory = function()
 	local closestPlayer, closestDistance = ESX.Game.GetClosestPlayer()
 	if closestPlayer ~= -1 and closestDistance <= 1.2 then
 		local searchPlayerPed = GetPlayerPed(closestPlayer)
-		if CanOpenTarget(searchPlayerPed) then
+		if ESX.PlayerData.job.name == 'police' or CanOpenTarget(searchPlayerPed) then
 			TriggerServerEvent('linden_inventory:openTargetInventory', GetPlayerServerId(closestPlayer))
 		else
-			error("You can not open this inventory")
+			TriggerEvent('mythic_notify:client:SendAlert', {type = 'error', text = _U('inventory_cannot_open_other'), length = 2500})
 		end
 	end
 end
@@ -127,6 +127,14 @@ AddEventHandler('randPickupAnim', function()
 	loadAnimDict('pickup_object')
 	TaskPlayAnim(playerPed,'pickup_object', 'putdown_low',5.0, 1.5, 1.0, 48, 0.0, 0, 0, 0)
 	Wait(1000)
+	ClearPedSecondaryTask(playerPed)
+end)
+
+RegisterNetEvent('targetPlayerAnim')
+AddEventHandler('targetPlayerAnim', function()
+	loadAnimDict('mp_ped_interaction')
+	TaskPlayAnim(playerPed,'mp_ped_interaction', 'handshake_guy_b',1.0, 1.0, 1.0, 49, 0.0, 0, 0, 0)
+	Wait(250)
 	ClearPedSecondaryTask(playerPed)
 end)
 
@@ -249,16 +257,18 @@ AddEventHandler('linden_inventory:refreshInventory', function(data)
 	})
 	ESX.PlayerData.inventory = data.inventory
 	ESX.SetPlayerData('inventory', data.inventory)
+	ESX.SetPlayerData('maxWeight', data.maxWeight)
+	ESX.SetPlayerData('weight', data.weight)
 end)
 
 RegisterNetEvent('linden_inventory:itemNotify')
 AddEventHandler('linden_inventory:itemNotify', function(item, count, slot, notify)
 	if count > 0 then notification = ('%s %sx'):format(notify, count)
-	else notification = 'Used' end
+	else notification = _U('used') end
 	if type(slot) == 'table' then
 		for k,v in pairs(slot) do
 			ESX.PlayerData.inventory[k] = item
-			if notify == 'Removed' and ESX.PlayerData.inventory[k].count then
+			if notify == _U('removed') and ESX.PlayerData.inventory[k].count then
 				local count = ESX.PlayerData.inventory[k].count - v
 				ESX.PlayerData.inventory[k].count = count
 				if item.name:find('WEAPON_') then TriggerEvent('linden_inventory:checkWeapon', item) end
@@ -266,11 +276,14 @@ AddEventHandler('linden_inventory:itemNotify', function(item, count, slot, notif
 		end
 	else
 		ESX.PlayerData.inventory[slot] = item
-		if notify == 'Removed' then
+		if notify == _U('removed') then
 			local count = ESX.PlayerData.inventory[slot].count - count
 			ESX.PlayerData.inventory[slot].count = count
 			if item.name:find('WEAPON_') then TriggerEvent('linden_inventory:checkWeapon', item) end
 		end
+	end
+	if currentInventory and string.find(currentInventory.name, 'Player') then
+		TriggerEvent('targetPlayerAnim')
 	end
 	ESX.SetPlayerData('inventory', ESX.PlayerData.inventory)
 	SendNUIMessage({ message = 'notify', item = item, text = notification })
@@ -303,7 +316,7 @@ HolsterWeapon = function(item)
 	DisarmPlayer()
 	ClearPedSecondaryTask(playerPed)
 	SetPedUsingActionMode(playerPed, -1, -1, 1)
-	SendNUIMessage({ message = 'notify', item = item, text = 'Holstered' })
+	SendNUIMessage({ message = 'notify', item = item, text = _U('holstered') })
 end
 
 DrawWeapon = function(item)
@@ -321,10 +334,9 @@ DrawWeapon = function(item)
 		SetCurrentPedWeapon(playerPed, `WEAPON_UNARMED`, true)
 		RemoveWeaponFromPed(playerPed, currentWeapon.hash)
 	end
-	TriggerEvent('linden_inventory:currentWeapon', item)
-	GiveWeaponToPed(playerPed, currentWeapon.hash, 0, true, false)
+	GiveWeaponToPed(playerPed, item.hash, 0, true, false)
 	Citizen.Wait(800)
-	SendNUIMessage({ message = 'notify', item = item, text = 'Equipped' })
+	SendNUIMessage({ message = 'notify', item = item, text = _U('equipped') })
 end
 
 RegisterNetEvent('linden_inventory:weapon')
@@ -342,24 +354,23 @@ AddEventHandler('linden_inventory:weapon', function(item)
 		else
 			item.hash = wepHash
 			DrawWeapon(item)
-			if currentWeapon.metadata.throwable then item.metadata.ammo = 1 end
+			if item.metadata.throwable then item.metadata.ammo = 1 end
 			if not item.ammoType then
 				local ammoType = GetAmmoType(item.name)
 				if ammoType then item.ammoType = ammoType end
 			end
-			currentWeapon = item
+			TriggerEvent('linden_inventory:currentWeapon', item)
 			SetCurrentPedWeapon(playerPed, currentWeapon.hash)
 			SetPedCurrentWeaponVisible(playerPed, true, false, false, false)
 			if item.metadata.weapontint then SetPedWeaponTintIndex(playerPed, item.name, item.metadata.weapontint) end
 			if item.metadata.components then
 				for k,v in pairs(item.metadata.components) do
 					local componentHash = ESX.GetWeaponComponent(item.name, v).hash
-					if componentHash then GiveWeaponComponentToPed(playerPed, wepHash, componentHash) end
+					if componentHash then GiveWeaponComponentToPed(playerPed, currentWeapon.hash, componentHash) end
 				end
 			end
 			SetAmmoInClip(playerPed, currentWeapon.hash, item.metadata.ammo)
 			if currentWeapon.name == 'WEAPON_FIREEXTINGUISHER' or currentWeapon.name == 'WEAPON_PETROLCAN' then SetAmmoInClip(playerPed, currentWeapon.hash, 10000) end
-			TriggerEvent('linden_inventory:currentWeapon', currentWeapon)
 		end
 		ClearPedSecondaryTask(playerPed)
 		TriggerEvent('linden_inventory:busy', false)
@@ -403,7 +414,7 @@ AddEventHandler('linden_inventory:addAmmo', function(ammo)
 				isBusy, useItemCooldown = false, false
 			end
 		else
-			error("You can't load the "..currentWeapon.label.." with "..ammo.label.." ammo")
+			TriggerEvent('mythic_notify:client:SendAlert', {type = 'error', text = _U('wrong_ammo', currentWeapon.label, ammo.label), length = 2500})
 		end
 	end
 end)
@@ -455,11 +466,14 @@ TriggerLoops = function()
 			for i = 19, 20 do
 				HideHudComponentThisFrame(i)
 			end
-			if isBusy then
+			if isBusy or useItemCooldown then
 				DisableControlAction(0, 24, true)
 				DisableControlAction(0, 25, true)
 				DisableControlAction(0, 142, true)
 				DisableControlAction(0, 257, true)
+				DisableControlAction(1, 140, true)
+				DisableControlAction(1, 141, true)
+				DisableControlAction(1, 142, true)
 			elseif not invOpen and not wait and CanOpenInventory() then
 				for i=1, #Keys, 1 do
 					if not isBusy and IsDisabledControlJustReleased(0, Keys[i]) and ESX.PlayerData.inventory[i] then
@@ -611,24 +625,24 @@ TriggerLoops = function()
 					end
 				end
 				if Config.WeaponsLicense then
-					local coords, text, license = vector3(12.42198, -1105.82, 29.7854), "Weapons License", 'weapon'
+					local coords, text, license = vector3(12.42198, -1105.82, 29.7854), _U('weapon_license'), 'weapon'
 					local distance = #(playerCoords - coords)
 					if distance <= 5 then
 						sleep = 5
 						DrawMarker(2, coords, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.3, 0.15, 0.2, 30, 150, 30, 100, false, false, false, true, false, false, false)
 						if not invOpen then
 							if distance <= 1.5 then
-								text = '[~g~E~s~] Purchase license'
+								text = _U('purchase_license')
 								if IsControlJustPressed(1,38) then
 									ESX.TriggerServerCallback('esx_license:checkLicense', function(hasWeaponLicense)
 										if hasWeaponLicense then
-											error("You already have a Weapons License")
+											TriggerEvent('mythic_notify:client:SendAlert', {type = 'error', text = _U('has_weapon_license'), length = 2500})
 										else
 											ESX.TriggerServerCallback('linden_inventory:buyLicense', function(bought)
 												if bought then
-													inform("You have purchased a Weapons License")
+													TriggerEvent('mythic_notify:client:SendAlert', {type = 'inform', text = _U('bought_weapon_license'), length = 2500})
 												else
-													error("You can not afford a Weapons License")
+													TriggerEvent('mythic_notify:client:SendAlert', {type = 'inform', text = _U('poor_weapon_license'), length = 2500})
 												end
 											end, license)
 										end
@@ -652,13 +666,15 @@ TriggerLoops = function()
 						local dist = #(playerCoords - pedCoords)
 						if not id or dist > 1.8 or not CanOpenTarget(ped) then
 							TriggerEvent('linden_inventory:closeInventory')
-							error("No longer able to access this inventory")
+							TriggerEvent('mythic_notify:client:SendAlert', {type = 'error', text = _U('inventory_lost_access'), length = 2500})
+						else
+							TaskTurnPedToFaceCoord(playerPed, pedCoords)
 						end
 					elseif not lastVehicle and currentInventory.coords then
 						local dist = #(playerCoords - currentInventory.coords)
 						if dist > 2 or CanOpenTarget(playerPed) then
 							TriggerEvent('linden_inventory:closeInventory')
-							error("No longer able to access this inventory")
+							TriggerEvent('mythic_notify:client:SendAlert', {type = 'error', text = _U('inventory_lost_access'), length = 2500})
 						end
 					end
 				end
@@ -669,17 +685,21 @@ TriggerLoops = function()
 
 	Citizen.CreateThread(function()
 		while PlayerLoaded do
-			local hasWeapon, wepHash = GetCurrentPedWeapon(playerPed, 1)
-			if hasWeapon then
-				if not currentWeapon then
-					local esxWeapon = ESX.GetWeaponFromHash(wepHash)
-					if esxWeapon then TriggerServerEvent('linden_inventory:weaponMismatch', wepHash) end
-				elseif wepHash ~= currentWeapon.hash then
-					local esxWeapon = ESX.GetWeaponFromHash(wepHash)
-					if esxWeapon then TriggerServerEvent('linden_inventory:weaponMismatch', wepHash) end
+			if not useItemCooldown then
+				local hasWeapon, wepHash = GetCurrentPedWeapon(playerPed, 1)
+				if hasWeapon then
+					if not currentWeapon then
+						local esxWeapon = ESX.GetWeaponFromHash(wepHash)
+						if esxWeapon then ClearWeapons() TriggerServerEvent('linden_inventory:weaponMismatch', esxWeapon.name) end
+					elseif wepHash ~= currentWeapon.hash then
+						local esxWeapon = ESX.GetWeaponFromHash(wepHash)
+						if esxWeapon then DisarmPlayer() end
+					end
+				elseif currentWeapon and currentWeapon.hash then
+					TriggerEvent('linden_inventory:currentWeapon', nil)
 				end
 			end
-			Citizen.Wait(1000)
+			Citizen.Wait(2000)
 		end
 	end)
 end
@@ -698,7 +718,7 @@ end)
 RegisterKeyMapping('reload', 'Reload weapon', 'keyboard', 'r')
 
 RegisterCommand('inv', function()
-	if isBusy or invOpen then error("You can't open your inventory right now") return end
+	if isBusy or invOpen then TriggerEvent('mythic_notify:client:SendAlert', {type = 'error', text = _U('inventory_cannot_open'), length = 2500}) return end
 	if CanOpenInventory() then
 		TriggerEvent('randPickupAnim')
 		if currentDrop then drop = currentDrop.name end
@@ -708,7 +728,7 @@ end)
 
 RegisterCommand('vehinv', function()
 	if not PlayerLoaded then return end
-	if not CanOpenInventory() or invOpen then error("You can't open your inventory right now") return end
+	if not CanOpenInventory() or invOpen then TriggerEvent('mythic_notify:client:SendAlert', {type = 'error', text = _U('inventory_cannot_open'), length = 2500}) return end
 	if not IsPedInAnyVehicle(playerPed, false) then -- trunk
 		local vehicle, vehiclePos = ESX.Game.GetVehicleInDirection()
 		if not vehiclePos then vehiclePos = GetEntityCoords(vehicle) end
@@ -775,7 +795,7 @@ RegisterCommand('vehinv', function()
 					return
 				end
 			else
-				error("Vehicle is locked")
+				TriggerEvent('mythic_notify:client:SendAlert', {type = 'error', text = _U('vehicle_locked'), length = 2500})
 			end
 		end
 	elseif IsPedInAnyVehicle(playerPed, false) then -- glovebox
@@ -819,8 +839,8 @@ end)
 RegisterCommand('weapondetails', function()
 	if currentWeapon and ESX.PlayerData.job.name == 'police' then
 		local msg
-		if currentWeapon.metadata.registered then msg = currentWeapon.label..' ('..currentWeapon.metadata.serial..') is registered to '..currentWeapon.metadata.registered
-		else msg = currentWeapon.label..' is not registered to anyone' end
+		if currentWeapon.metadata.registered then msg = _U('weapon_registered', currentWeapon.label, currentWeapon.metadata.serial, currentWeapon.metadata.registered)
+		else msg = _U('weapon_unregistered', currentWeapon.label) end
 		TriggerEvent('mythic_notify:client:SendAlert', {type = 'inform', text = msg, length = 8000})
 	end
 end)
@@ -834,7 +854,8 @@ RegisterNUICallback('devtool', function()
 end)
 
 RegisterNUICallback('notification', function(data)
-	if data.type == 2 then error(data.message) else inform(data.message) end
+	if data.type == 2 then data.type = 'error' else data.type = 'inform' end
+	TriggerEvent('mythic_notify:client:SendAlert', {type = data.type, text = _U(data.message), length = 2500})
 end)
 
 RegisterNUICallback('useItem', function(data, cb)
@@ -844,11 +865,12 @@ end)
 RegisterNUICallback('giveItem', function(data, cb)
 	local closestPlayer, closestPlayerDistance = ESX.Game.GetClosestPlayer()
 	if closestPlayer == -1 or closestPlayerDistance > 2.0 then 
-		error('There is nobody nearby')
+		TriggerEvent('mythic_notify:client:SendAlert', {type = 'error', text = _U('nobody_nearby'), length = 2500})
 	elseif data.inv == 'Playerinv' then
 		if data.amount >= 1 then
 			TriggerServerEvent('linden_inventory:giveItem', data, GetPlayerServerId(closestPlayer))
-		else error('You must enter an amount to give') end
+			TriggerEvent('randPickupAnim')
+		else TriggerEvent('mythic_notify:client:SendAlert', {type = 'error', text = _U('give_amount'), length = 2500}) end
 	end
 end)
 
@@ -859,7 +881,7 @@ end)
 RegisterNUICallback('BuyFromShop', function(data)
 	if data.count >= 1 then
 		TriggerServerEvent('linden_inventory:buyItem', data)
-	else error('You must select an amount to buy') end
+	else TriggerEvent('mythic_notify:client:SendAlert', {type = 'error', text = _U('buy_amount'), length = 2500})end
 end)
 
 RegisterNUICallback('exit',function(data)
@@ -893,9 +915,9 @@ AddEventHandler('linden_inventory:useItem',function(item)
 						end
 					end
 				end
-				if not component then error("This weapon is incompatible with "..item.label) return end
+				if not component then TriggerEvent('mythic_notify:client:SendAlert', {type = 'error', text = _U('component_invalid', item.label), length = 2500}) return end
 				if HasPedGotWeaponComponent(playerPed, currentWeapon.hash, component.hash) then
-					error("This weapon already has a "..item.label) return
+					TriggerEvent('mythic_notify:client:SendAlert', {type = 'error', text = _U('component_has', item.label), length = 2500}) return
 				end
 			end
 				
@@ -906,12 +928,6 @@ AddEventHandler('linden_inventory:useItem',function(item)
 					isBusy = true
 					if data.dofirst then TriggerEvent(data.dofirst) end
 					if data.useTime and data.useTime >= 0 then
-						if not data.animDict or not data.anim then
-							data.animDict = 'pickup_object'
-							data.anim = 'putdown_low'
-						end
-						if not data.flags then data.flags = 48 end
-							
 						exports['mythic_progbar']:Progress({
 							name = 'useitem',
 							duration = data.useTime,
@@ -919,7 +935,7 @@ AddEventHandler('linden_inventory:useItem',function(item)
 							useWhileDead = false,
 							canCancel = false,
 							controlDisables = { disableMovement = data.disableMove, disableCarMovement = false, disableMouse = false, disableCombat = true },
-							animation = { animDict = data.animDict, anim = data.anim, flags = data.flags },
+							animation = { animDict = data.animDict or 'pickup_object', anim = data.anim or 'putdown_low', flags = data.flags or 48, bone = data.bone },
 							prop = { model = data.model, coords = data.coords, rotation = data.rotation }
 						})
 						Citizen.Wait(data.useTime)
@@ -949,7 +965,6 @@ AddEventHandler('linden_inventory:useItem',function(item)
 					end
 
 					if data.event then TriggerEvent(data.event) end
-					if data.serverEvent then TriggerServerEvent(data.serverEvent, item) end
 					useItemCooldown = false
 					isBusy = false
 				end
