@@ -66,14 +66,14 @@ Config.Trunks = {
 	[7] = {5, 20000}, -- super
 	[8] = {10,  20000},-- motorcycle
 	[9] = {25, 200000}, -- offroad
-	[10] = {25, 300000}, -- industrial
-	[11] = {25, 200000}, -- offroad
-	[12] = {25, 100000}, -- van
+	[10] = {25, 400000}, -- industrial
+	[11] = {25, 50000}, -- offroad
+	[12] = {25, 200000}, -- van
 	--[14] -- boat
 	--[15] -- helicopter 
 	--[16] -- plane
 	[17] = {12, 200000}, -- service
 	[18] = {12, 100000}, -- emergency
 	[19] = {12, 100000}, -- military
-	[20] = {20, 200000} -- commercial
+	[20] = {20, 400000} -- commercial
 }

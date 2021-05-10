@@ -90,10 +90,10 @@ Config.DollaPills = {
 		colour = 48,
 		scale = 0.7
 	}, inventory = {
-		{ name = 'acetone', price = 75, metadata={type= '95% Acetone'} },
-		{ name = 'pseudoephedrine_pills_10mg', price = 300 },
-		{ name = 'hydrocloric_acid_500lm', price = 30, metadata={type= '20% Hydrocloric acid'} },
-		{ name = 'dextrose', price = 30, metadata={type= '50% Dextrose Solution'} },
+		{ name = 'acetone', price = 75 },
+		{ name = 'pseudoephedrine_pills_10mg', price = 80 },
+		{ name = 'hydrocloric_acid_500lm', price = 30},
+		{ name = 'dextrose', price = 30 },
 		{ name = 'benzaldehyde_1L', price = 30 },
 	}
 }
