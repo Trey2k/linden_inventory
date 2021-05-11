@@ -208,4 +208,9 @@ Config.ItemList = {
 		event = 'weasel-armor:usePlateTitanium'
 	},
 	
+	['radio'] = {
+		useTime = 0,
+		consume = 0,
+		event = 'rp-radio:useRadio'
+	},
 }

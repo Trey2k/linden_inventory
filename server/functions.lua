@@ -105,6 +105,11 @@ end
 
 ItemNotify = function(xPlayer, item, count, slot, type)
 	local xItem = Items[item.name]
+	if item.name == 'radio' and type == 'Removed' then
+        TriggerClientEvent('Radio.Set', source, false)
+	elseif item.name == 'radio' and type == 'Added' then
+        TriggerClientEvent('Radio.Set', source, true)
+    end
 	if xPlayer and xItem then
 		TriggerClientEvent('linden_inventory:itemNotify', xPlayer.source, item, count, slot, type)
 	end

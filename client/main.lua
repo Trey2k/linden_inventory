@@ -14,6 +14,12 @@ ClearWeapons = function()
 	SetPedCanSwitchWeapon(playerPed, false)
 end
 
+RegisterNetEvent("linden_inventory:setIsBusy")
+AddEventHandler("linden_inventory:setIsBusy", function(value) 
+	isBusy = value
+end)
+
+
 DisarmPlayer = function(weapon)
 	if currentWeapon then
 		currentWeapon.metadata.ammo = GetAmmoInPedWeapon(playerPed, currentWeapon.hash)
@@ -968,6 +974,7 @@ AddEventHandler('linden_inventory:useItem',function(item)
 					if data.serverEvent then TriggerServerEvent(data.serverEvent, item) end
 					useItemCooldown = false
 					isBusy = false
+					
 				end
 			end, item.name, item.slot, item.metadata, esxItem)
 		end
