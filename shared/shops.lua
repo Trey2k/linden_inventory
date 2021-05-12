@@ -43,7 +43,7 @@ Config.Hunting = {
 		colour = 69,
 		scale = 0.9
 	}, inventory = {
-		{ name = 'ammo-musket', price = 25, },
+		{ name = 'ammo-musket', price = 10, },
 		{ name = 'WEAPON_KNIFE', price = 150 },
 		{ name = 'WEAPON_HATCHET', price = 200 },
 		{ name = 'WEAPON_MUSKET', price = 2000, metadata = { registered = true }, license = 'weapon' },
@@ -63,7 +63,8 @@ Config.YouTool = {
 		{ name = 'matches', price = 8 },
 		{ name = 'tongs', price = 150 },
 		{ name = 'drain_cleaner', price = 20, metadata={type= '10% Hydrocloric Acid'} },
-		{ name = 'steel_pickaxe', price = 500, metadata={type= '300'} },
+		{ name = 'jackhammer', price = 500, metadata={type= '300'} },
+		{ name = 'jackhammer_mk2', price = 2000, metadata={type= '300'} },
 		{ name = 'WEAPON_HATCHET', price = 200 },
 		
 
@@ -91,10 +92,10 @@ Config.DollaPills = {
 		scale = 0.7
 	}, inventory = {
 		{ name = 'acetone', price = 75 },
-		{ name = 'pseudoephedrine_pills_10mg', price = 80 },
+		{ name = 'pseudoephedrine_pills_10mg', price = 75 },
 		{ name = 'hydrocloric_acid_500lm', price = 30},
-		{ name = 'dextrose', price = 30 },
-		{ name = 'benzaldehyde_1L', price = 30 },
+		{ name = 'dextrose', price = 20 },
+		{ name = 'benzaldehyde_1L', price = 20 },
 	}
 }
 
@@ -188,9 +189,13 @@ Config.Medicine = {
 		scale = 0.8
 	}, inventory = {
 		{ name = 'medkit', price = 50 },
+		{ name = 'pseudoephedrine_pills_10mg', price = 20 },
 		{ name = 'bandage', price = 3 },
 		{ name = 'radio', price = 120 },
 		{ name = 'repairkit', price = 1000 },
+		{ name = 'plate_steel', price = 40 },
+		{ name = 'plate_titanium', price = 80 },
+		{ name = 'plate_carrier', price = 125 },
 		{ name = 'WEAPON_STUNGUN', price = 500, metadata = { registered = true, serial = 'EMS' } },
 	}
 }
