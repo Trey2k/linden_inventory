@@ -107,6 +107,7 @@ Config.SmokeOnTheWater = {
 	}, inventory = {
 		
 		{ name = 'weed', price = 9 },
+		{ name = 'rolling_paper', price = 2 },
 		{ name = 'weed_pouch', price = 500 },
 		{ name = 'weed_seed', price = 35 },
 	}
@@ -135,6 +136,7 @@ Config.MirrorParkWeedShop = {
 		scale = 0.9
 	}, inventory = {
 		{ name = 'weed', price = 9 },
+		{ name = 'rolling_paper', price = 2 },
 		{ name = 'weed_pouch', price = 500 },
 		{ name = 'weed_seed', price = 35 },
 	}
@@ -151,7 +153,6 @@ Config.Ammunation = {
 		{ name = 'WEAPON_KNIFE', price = 200 },
 		{ name = 'WEAPON_BAT', price = 100 },
 		{ name = 'plate_steel', price = 50 },
-		{ name = 'plate_titanium', price = 100 },
 		{ name = 'plate_carrier', price = 175 },
 		{ name = 'WEAPON_PISTOL', price = 1000, metadata = { registered = true }, license = 'weapon' },
 		{ name = 'WEAPON_PISTOL_MK2', price = 1250, metadata = { registered = true }, license = 'weapon' },
