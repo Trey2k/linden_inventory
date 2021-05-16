@@ -8,8 +8,8 @@ Config.CheckVersionDelay = 60
 -- Number of inventory slots
 Config.PlayerSlots = 50
 
--- Regular carry weight, can be increased by backpacks through esx_skin
-Config.PlayerWeight = 30000
+-- If vehicle plates are stored with a trailing space, set to false (i.e. `XXX-000 `)
+Config.TrimPlate = false  -- Recommended: true (default is false to match previous functionality)
 
 -- Blur the screen while in an inventory
 Config.EnableBlur = true

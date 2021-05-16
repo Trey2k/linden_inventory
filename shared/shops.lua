@@ -201,6 +201,39 @@ Config.Medicine = {
 	}
 }
 
+Config.BlackMarketArms = {
+	name = 'Black Market (Arms)',
+	inventory = {
+		{
+			name = 'WEAPON_DAGGER',
+			price = 5000,
+			metadata = {
+				registered = false
+			},
+		},
+		{
+			name = 'WEAPON_CERAMICPISTOL',
+			price = 50000,
+			metadata = {
+				registered = false
+			},
+		},
+		{
+			name = 'at_suppressor_pistol',
+			price = 50000,
+		},
+		{
+			name = 'ammo-rifle',
+			price = 1000
+		},
+		{
+			name = 'ammo-rifle2',
+			price = 1000
+		}
+	}
+}
+
+
 Config.Shops = {
 	{ type = Config.Ammunation, coords = vector3(-662.180, -934.961, 21.829)--[[, currency = 'money']] }, -- can set currency like so
 	{ type = Config.Ammunation, coords = vector3(810.25, -2157.60, 29.62)--[[, currency = 'burger']] },
@@ -263,6 +296,8 @@ Config.Shops = {
 	{ coords = vector3(-2544.092, 2316.184, 33.2), name = 'RON'},
 
 	
-	{ type = Config.PoliceArmoury, job = 'police', coords = vector3(452.56, -983.89, 30.69), name = 'Police Armoury'},
-	{ type = Config.Medicine, job = 'ambulance', coords = vector3(325.17, -582.7, 43.39), name = 'Medicine Cabinet'},
+	{ type = Config.PoliceArmoury, job = 'police', coords = vector3(452.56, -983.89, 30.69) },
+	{ type = Config.Medicine, job = 'ambulance', coords = vector3(325.17, -582.7, 43.39) },
+
+	-- { type = Config.BlackMarketArms, coords = vector3(309.09, -913.75, 56.46), currency = 'black_money' },
 }

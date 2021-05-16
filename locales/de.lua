@@ -1,4 +1,6 @@
 Locales['de'] = {
+	['male'] = "Männlich",
+	['female'] = "Weiblich",
 	['used'] = "Benutzt",
 	['removed'] = "Entfernt",
 	['added'] = "Hinzugefügt",
@@ -32,4 +34,5 @@ Locales['de'] = {
 	['item_unlicensed'] = "Du besitzt keine gültige Lizenz",
 	['item_not_enough'] = "Du hast nicht genügend %s",
 	['cannot_afford'] = "Das kannst Du Dir nicht leisten. Dir fehlen %s",
+	['stash_lowgrade'] = "Du bist nicht autorisiert das zu nehmen"
 }

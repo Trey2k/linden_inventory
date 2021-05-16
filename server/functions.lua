@@ -1,6 +1,6 @@
 GetPlayerIdentification = function(xPlayer)
 	local sex, identifier = xPlayer.get('sex')
-	if sex == 'm' then sex = 'Male' elseif sex == 'f' then sex = 'Female' end
+	if sex == 'm' then sex = _U('male') elseif sex == 'f' then sex = _U('female') end
 	if Config.ShowIdentifierID then identifier = ' ('..xPlayer.getIdentifier()..')' else identifier = '' end
 	return ('Sex: %s | DOB: %s%s'):format( sex, xPlayer.get('dateofbirth'), identifier )
 end
@@ -111,6 +111,9 @@ ItemNotify = function(xPlayer, item, count, slot, type)
         TriggerClientEvent('Radio.Set', source, true)
     end
 	if xPlayer and xItem then
+		if item.name == 'radio' and xPlayer.getInventoryItem('radio').count == 0 then
+			--TriggerClientEvent('turnoffradio', xPlayer.source)
+		end
 		TriggerClientEvent('linden_inventory:itemNotify', xPlayer.source, item, count, slot, type)
 	end
 end
@@ -287,6 +290,7 @@ GetItems = function(id, type, owner)
 	if not owner then
 		if type == 'trunk' or type == 'glovebox' then
 			local plate = string.match(id, "-(.*)")
+			if Config.TrimPlate then plate = ESX.Math.Trim(plate) end
 			local result = exports.ghmattimysql:scalarSync('SELECT plate, owner FROM owned_vehicles WHERE plate = @plate', {
 				['@plate'] = plate
 			})
