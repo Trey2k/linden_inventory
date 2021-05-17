@@ -54,7 +54,6 @@ Citizen.CreateThread(function()
 		end
 		if timer > 0 then
 			timer = timer - 1
-			print(timer)
 		end
 		if timer > 1250 then
 			SetEntityHealth(GetPlayerPed(-1), 0)
