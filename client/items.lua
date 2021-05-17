@@ -41,21 +41,21 @@ AddEventHandler('linden_inventory:armour', function()
 	SetPedArmour(playerPed, 100)
 end)
 Citizen.CreateThread(function()
-	RequestAnimSet("MOVE_M@DRUNK") 
+	RequestAnimSet("MOVE_M@DRUNK@VERYDRUNK")
+	RequestAnimSet("MOVE_M@DRUNK@MODERATEDRUNK")
+	RequestAnimSet("MOVE_M@DRUNK@SLIGHTLYDRUNK") 
 	info.drank = false
 	local timer = 0
 	while true do 
-		Wait(1000)
+		Citizen.Wait(1000)
 		if info.drank then
 			timer = timer + 100
 			info.drank = false
-			print("drank")
 		end
 		if timer > 0 then
 			timer = timer - 1
-			print(timer)
 		end
-		if timer > 1290 then
+		if timer > 1200 then
 			SetEntityHealth(GetPlayerPed(-1), 0)
 		end
 		if timer > 700 then
