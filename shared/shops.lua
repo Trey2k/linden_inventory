@@ -20,8 +20,18 @@ Config.Liquor = {
 		colour = 69,
 		scale = 0.6
 	}, inventory = {
-		{ name = 'water', price = 10 },
-		{ name = 'cola', price = 10 },
+		{ name = 'whiskey', price = 20 },
+	}
+}
+
+Config.VU = {
+	name = 'Vanilla Unicorn',
+	blip = {
+		id = 93,
+		colour = 69,
+		scale = 0.6
+	}, inventory = {
+		{ name = 'whisky', price = 20 },
 	}
 }
 
@@ -256,6 +266,8 @@ Config.Shops = {
 	{ type = Config.YouTool, coords = vector3(45.72, -1748.88, 29.65), name = 'YouTool' },
 	{ type = Config.YouTool, coords = vector3(2748.0, 3473.0, 55.67), name = 'YouTool' },
 	{ type = Config.YouTool, coords = vector3(342.99, -1298.26, 32.51), name = 'YouTool' }, 
+
+	{ type = Config.VU, coords = vector3(127.85, -1284.68, 29.28), name = 'Vanilla Unicorn Bar' },
 
 	---------------------------- OUR SHOPS ADDED ------------------------------------------------------
 

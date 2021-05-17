@@ -149,6 +149,17 @@ Config.ItemList = {
 		event = 'linden_inventory:cola'
 	},
 
+	['whisky'] = {
+		thirst = 2000,
+		animDict = 'mp_player_intdrink',
+		anim = 'loop_bottle',
+		model = 'prop_cs_shot_glass',
+		coords = { x = 0.03, y = 0.0, z = 0.02 },
+		rotation = { x = 0.0, y = -13.5, z = -1.5 },
+		useTime = 1000,
+		event = 'linden_inventory:whisky'
+	},
+
 	['mustard'] = {
 		thirst = 10000,
 		hunger = 10000,
@@ -160,6 +171,29 @@ Config.ItemList = {
 		useTime = 2500,
 		event = 'linden_inventory:mustard'
 	},
+
+	['icecream'] = {
+		thirst = 50000,
+		animDict = 'mp_player_inteat@burger',
+		anim = 'mp_player_int_eat_burger_fp',
+		model = 'prop_golf_ball',
+		coords = { x = 0.01, y = 0.0, z = -0.07 },
+		rotation = { x = 1.0, y = -1.0, z = -1.5 },
+		useTime = 2500,
+		event = 'linden_inventory:icecream'
+	},
+		
+	['hotdog'] = {
+		hunger = 2000000,
+		animDict = 'mp_player_inteat@burger',
+		anim = 'mp_player_int_eat_burger_fp',
+		model = 'prop_cs_hotdog_01',
+		coords = { x = 0.01, y = 0.0, z = -0.07 },
+		rotation = { x = 1.0, y = 0.0, z = 0.5 },
+		useTime = 2500,
+		event = 'linden_inventory:hotdog'
+	},
+
 
 	['bandage'] = {
 		animDict = 'missheistdockssetup1clipboard@idle_a',
