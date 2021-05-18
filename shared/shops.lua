@@ -10,6 +10,7 @@ Config.General = {
 		{ name = 'water', price = 3 },
 		{ name = 'cola', price = 4 },
 		{ name = 'bandage', price = 8 },
+		{ name = 'hotdog', price = 10 },
 	}
 }
 
@@ -21,6 +22,16 @@ Config.Liquor = {
 		scale = 0.6
 	}, inventory = {
 		{ name = 'whiskey', price = 20 },
+	}
+}
+
+Config.Jail = {
+	name = 'Jail Store',
+	inventory = {
+		{ name = 'burger', price = 7 },
+		{ name = 'water', price = 5 },
+		{ name = 'bandage', price = 10 },
+		{ name = 'joint', price = 5000 },
 	}
 }
 
@@ -277,7 +288,7 @@ Config.Shops = {
 	{ type = Config.StockMarket, coords = vector3(232.18, -1095, 29.29), name = 'Stock Market' },						-- stock market shop 
 	{ type = Config.Burger, coords = vector3(-1193.19, -893.63, 13.9), name = 'Burger Shot' }, 							-- burger shot
 	{ type = Config.Hunting, coords = vector3(-774.18, 5602.75, 33.54), name = 'Hunting Shop' }, 						-- huning shop near paleto sells hunting rifles 
-
+	{ type = Config.Jail, coords = vector3(1793.98, 2483.11, -122.69), name = 'Prison Shop' }, 
 
 	---- dolla pills
 
