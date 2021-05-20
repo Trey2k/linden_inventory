@@ -214,6 +214,7 @@ Config.Medicine = {
 	}, inventory = {
 		{ name = 'medkit', price = 50 },
 		{ name = 'pseudoephedrine_pills_10mg', price = 20 },
+		{ name = 'metandienone', price = 2000 },
 		{ name = 'bandage', price = 3 },
 		{ name = 'radio', price = 120 },
 		{ name = 'repairkit', price = 1000 },
