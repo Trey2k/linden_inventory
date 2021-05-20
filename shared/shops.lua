@@ -22,6 +22,7 @@ Config.Liquor = {
 		scale = 0.6
 	}, inventory = {
 		{ name = 'whiskey', price = 20 },
+		{ name = 'bottle-vodka', price = 100 },
 	}
 }
 
@@ -43,6 +44,7 @@ Config.VU = {
 		scale = 0.6
 	}, inventory = {
 		{ name = 'whisky', price = 20 },
+		{ name = 'bottle-vodka', price = 100 },
 	}
 }
 

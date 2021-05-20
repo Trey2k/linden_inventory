@@ -160,6 +160,17 @@ Config.ItemList = {
 		event = 'linden_inventory:whisky'
 	},
 
+	['bottle-vodka'] = {
+		thirst = 2000,
+		animDict = 'mp_player_intdrink',
+		anim = 'loop_bottle',
+		model = 'prop_cs_whiskey_bottle',
+		coords = { x = 0.03, y = 0.0, z = 0.02 },
+		rotation = { x = 0.0, y = -13.5, z = -1.5 },
+		useTime = 3000,
+		event = 'linden_inventory:vodka'
+	},
+
 	['mustard'] = {
 		thirst = 10000,
 		hunger = 10000,

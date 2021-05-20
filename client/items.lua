@@ -1,4 +1,4 @@
-local info = {drank = false}
+local info = {whisky = false, vodka = false}
 
 AddEventHandler('linden_inventory:burger', function()
 	TriggerEvent('mythic_notify:client:SendAlert', {type = 'inform', text = 'You ate a delicious burger', length = 2500})
@@ -23,9 +23,16 @@ end)
 AddEventHandler('linden_inventory:hotdog', function()
 	TriggerEvent('mythic_notify:client:SendAlert', {type = 'inform', text = 'You.. ate a hotdog', length = 2500})
 end)
+
 AddEventHandler('linden_inventory:whisky', function()
 	TriggerEvent('mythic_notify:client:SendAlert', {type = 'inform', text = 'You.. took a shot of whisky', length = 2500})
-	info.drank = true
+	info.whisky = true
+	ShakeGameplayCam("DRUNK_SHAKE", 1.0)
+end)
+
+AddEventHandler('linden_inventory:vodka', function()
+	TriggerEvent('mythic_notify:client:SendAlert', {type = 'inform', text = 'You.. drank a bottle of vodka', length = 2500})
+	info.vodka = true
 	ShakeGameplayCam("DRUNK_SHAKE", 1.0)
 end)
 
@@ -44,13 +51,18 @@ Citizen.CreateThread(function()
 	RequestAnimSet("MOVE_M@DRUNK@VERYDRUNK")
 	RequestAnimSet("MOVE_M@DRUNK@MODERATEDRUNK")
 	RequestAnimSet("MOVE_M@DRUNK@SLIGHTLYDRUNK") 
-	info.drank = false
+	info.whisky = false
+	info.vodka  = false
 	local timer = 0
 	while true do 
 		Citizen.Wait(1000)
-		if info.drank then
+		if info.whisky then
 			timer = timer + 100
-			info.drank = false
+			info.whisky = false
+		end
+		if info.vodka then
+			timer = timer + 800
+			info.vodka = false
 		end
 		if timer > 0 then
 			timer = timer - 1
