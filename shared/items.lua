@@ -249,12 +249,12 @@ Config.ItemList = {
 	},
 
 	['weed_seed'] = {
-		useTime = 5000,
+		useTime = 0,
 		consume = 0,
 		event = 'weasel-plants:plantSeed'
 	},
 	['coke_seed'] = {
-		useTime = 5000,
+		useTime = 0,
 		consume = 0,
 		event = 'weasel-plants:plantSeed'
 	},
