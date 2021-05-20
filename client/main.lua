@@ -978,7 +978,7 @@ AddEventHandler('linden_inventory:useItem',function(item)
 						TriggerServerEvent('linden_inventory:updateWeapon', currentWeapon, component.name)
 					end
 
-					if data.event then TriggerEvent(data.event) end
+					if data.event then TriggerEvent(data.event, item) end
 					if data.serverEvent then TriggerServerEvent(data.serverEvent, item) end
 					useItemCooldown = false
 					isBusy = false

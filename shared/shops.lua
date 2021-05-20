@@ -170,14 +170,16 @@ Config.Ammunation = {
 		colour = 69,
 		scale = 0.8
 	}, inventory = {
-		{ name = 'ammo-9', price = 5, },
+		{ name = 'ammo-9', price = 2, },
+		{ name = 'ammo-45', price = 4, },
+		{ name = 'ammo-rifle2', price = 6, },
 		{ name = 'WEAPON_KNIFE', price = 200 },
 		{ name = 'WEAPON_BAT', price = 100 },
 		{ name = 'plate_steel', price = 50 },
 		{ name = 'plate_carrier', price = 175 },
 		{ name = 'WEAPON_PISTOL', price = 1000, metadata = { registered = true }, license = 'weapon' },
 		{ name = 'WEAPON_PISTOL_MK2', price = 1250, metadata = { registered = true }, license = 'weapon' },
-		
+	
 	}
 }
 

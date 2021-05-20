@@ -247,4 +247,15 @@ Config.ItemList = {
 		consume = 0,
 		event = 'rp-radio:useRadio'
 	},
+
+	['weed_seed'] = {
+		useTime = 5000,
+		consume = 0,
+		event = 'weasel-plants:plantSeed'
+	},
+	['coke_seed'] = {
+		useTime = 5000,
+		consume = 0,
+		event = 'weasel-plants:plantSeed'
+	},
 }
