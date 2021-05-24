@@ -1,4 +1,4 @@
-local info = {whisky = false, vodka = false}
+local info = {whisky = false, vodka = false, beer = false, margarita = false}
 
 AddEventHandler('linden_inventory:burger', function()
 	TriggerEvent('mythic_notify:client:SendAlert', {type = 'inform', text = 'You ate a delicious burger', length = 2500})
@@ -24,6 +24,18 @@ AddEventHandler('linden_inventory:hotdog', function()
 	TriggerEvent('mythic_notify:client:SendAlert', {type = 'inform', text = 'You.. ate a hotdog', length = 2500})
 end)
 
+AddEventHandler('linden_inventory:bread', function()
+	TriggerEvent('mythic_notify:client:SendAlert', {type = 'inform', text = 'You.. ate an entire loaf of bread', length = 2500})
+end)
+
+AddEventHandler('linden_inventory:tomato', function()
+	TriggerEvent('mythic_notify:client:SendAlert', {type = 'inform', text = 'You.. ate a tomato', length = 2500})
+end)
+
+AddEventHandler('linden_inventory:cheese', function()
+	TriggerEvent('mythic_notify:client:SendAlert', {type = 'inform', text = 'You.. ate a slice of cheese', length = 2500})
+end)
+
 AddEventHandler('linden_inventory:whisky', function()
 	TriggerEvent('mythic_notify:client:SendAlert', {type = 'inform', text = 'You.. took a shot of whisky', length = 2500})
 	info.whisky = true
@@ -33,6 +45,18 @@ end)
 AddEventHandler('linden_inventory:vodka', function()
 	TriggerEvent('mythic_notify:client:SendAlert', {type = 'inform', text = 'You.. drank a bottle of vodka', length = 2500})
 	info.vodka = true
+	ShakeGameplayCam("DRUNK_SHAKE", 1.0)
+end)
+
+AddEventHandler('linden_inventory:beer', function()
+	TriggerEvent('mythic_notify:client:SendAlert', {type = 'inform', text = 'You.. drank a bottle of beer', length = 2500})
+	info.beer = true
+	ShakeGameplayCam("DRUNK_SHAKE", 1.0)
+end)
+
+AddEventHandler('linden_inventory:margarita', function()
+	TriggerEvent('mythic_notify:client:SendAlert', {type = 'inform', text = 'You.. drank a margarita', length = 2500})
+	info.margarita = true
 	ShakeGameplayCam("DRUNK_SHAKE", 1.0)
 end)
 
@@ -61,16 +85,24 @@ Citizen.CreateThread(function()
 			info.whisky = false
 		end
 		if info.vodka then
-			timer = timer + 800
+			timer = timer + 1000
 			info.vodka = false
+		end
+		if info.beer then
+			timer = timer + 25
+			info.beer = false
+		end
+		if info.margarita then
+			timer = timer + 300
+			info.margarita = false
 		end
 		if timer > 0 then
 			timer = timer - 1
 		end
-		if timer > 1200 then
+		if timer > 1600 then
 			SetEntityHealth(GetPlayerPed(-1), 0)
 		end
-		if timer > 700 then
+		if timer > 900 then
 			SetPedMovementClipset(GetPlayerPed(-1), "MOVE_M@DRUNK@VERYDRUNK", 1.0)
 		end
 		if timer < 500 and timer > 300 then

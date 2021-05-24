@@ -6,11 +6,14 @@ Config.General = {
 		scale = 0.6
 	}, inventory = {
 		{ name = 'burger', price = 5 },
-		{ name = 'plastic_pouch', price = 3 },
+		{ name = 'hotdog', price = 5 },
+		{ name = 'bread', price = 8 },
+		{ name = 'cheese', price = 5 },
 		{ name = 'water', price = 3 },
 		{ name = 'cola', price = 4 },
+		{ name = 'plastic_pouch', price = 3 },
 		{ name = 'bandage', price = 8 },
-		{ name = 'hotdog', price = 10 },
+		
 	}
 }
 
@@ -21,8 +24,9 @@ Config.Liquor = {
 		colour = 69,
 		scale = 0.6
 	}, inventory = {
-		{ name = 'whiskey', price = 20 },
-		{ name = 'bottle-vodka', price = 100 },
+		{ name = 'beer', price = 8 },
+		{ name = 'whisky', price = 25 },
+		{ name = 'bottle-vodka', price = 150 },
 	}
 }
 
@@ -43,7 +47,9 @@ Config.VU = {
 		colour = 69,
 		scale = 0.6
 	}, inventory = {
-		{ name = 'whisky', price = 20 },
+		{ name = 'beer', price = 5 },
+		{ name = 'whisky', price = 10 },
+		{ name = 'margarita', price = 30 },
 		{ name = 'bottle-vodka', price = 100 },
 	}
 }
@@ -103,8 +109,6 @@ Config.Nail = {
 	}, inventory = {
 		{ name = 'acetone', price = 75 },
 		{ name = 'hydrogen_peroxide450ml', price = 15 },
-
-		
 	}
 }
 
@@ -119,6 +123,7 @@ Config.DollaPills = {
 		{ name = 'hydrocloric_acid_500lm', price = 30},
 		{ name = 'dextrose', price = 20 },
 		{ name = 'benzaldehyde_1L', price = 20 },
+		{ name = 'hydrogen_peroxide450ml', price = 15 },
 	}
 }
 
