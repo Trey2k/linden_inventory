@@ -127,6 +127,17 @@ Config.ItemList = {
 		event = 'linden_inventory:burger'
 	},
 
+	['bread'] = {
+		hunger = 2000000,
+		animDict = 'mp_player_inteat@burger',
+		anim = 'mp_player_int_eat_burger_fp',
+		model = 'v_res_fa_bread01',
+		coords = { x = 0.02, y = 0.022, z = -0.02 },
+		rotation = { x = 0.0, y = 5.0, z = 0.0 },
+		useTime = 2500,
+		event = 'linden_inventory:bread'
+	},
+
 	['water'] = {
 		thirst = 2000000,
 		animDict = 'mp_player_intdrink',
@@ -158,6 +169,39 @@ Config.ItemList = {
 		rotation = { x = 0.0, y = -13.5, z = -1.5 },
 		useTime = 1000,
 		event = 'linden_inventory:whisky'
+	},
+
+	['bottle-vodka'] = {
+		thirst = 2000,
+		animDict = 'mp_player_intdrink',
+		anim = 'loop_bottle',
+		model = 'prop_cs_whiskey_bottle',
+		coords = { x = 0.03, y = 0.0, z = 0.02 },
+		rotation = { x = 0.0, y = -13.5, z = -1.5 },
+		useTime = 3000,
+		event = 'linden_inventory:vodka'
+	},
+
+	['beer'] = {
+		thirst = 80000,
+		animDict = 'mp_player_intdrink',
+		anim = 'loop_bottle',
+		model = 'prop_beer_bottle',
+		coords = { x = 0.03, y = 0.0, z = -0.16 },
+		rotation = { x = 0.0, y = -13.5, z = -1.5 },
+		useTime = 3000,
+		event = 'linden_inventory:beer'
+	},
+
+	['margarita'] = {
+		thirst = 80000,
+		animDict = 'mp_player_intdrink',
+		anim = 'loop_bottle',
+		model = 'prop_cocktail_glass',
+		coords = { x = 0.03, y = 0.0, z = -0.02 },
+		rotation = { x = 0.0, y = -13.5, z = 0.0 },
+		useTime = 3000,
+		event = 'linden_inventory:beer'
 	},
 
 	['mustard'] = {
@@ -192,6 +236,28 @@ Config.ItemList = {
 		rotation = { x = 1.0, y = 0.0, z = 0.5 },
 		useTime = 2500,
 		event = 'linden_inventory:hotdog'
+	},
+
+	['tomato'] = {
+		hunger = 200000,
+		animDict = 'mp_player_inteat@burger',
+		anim = 'mp_player_int_eat_burger_fp',
+		model = '',
+		coords = { x = 0.01, y = 0.0, z = -0.07 },
+		rotation = { x = 1.0, y = 0.0, z = 0.5 },
+		useTime = 2500,
+		event = 'linden_inventory:tomato'
+	},
+
+	['cheese'] = {
+		hunger = 200000,
+		animDict = 'mp_player_inteat@burger',
+		anim = 'mp_player_int_eat_burger_fp',
+		model = '',
+		coords = { x = 0.01, y = 0.0, z = -0.07 },
+		rotation = { x = 1.0, y = 0.0, z = 0.5 },
+		useTime = 2500,
+		event = 'linden_inventory:cheese'
 	},
 
 
