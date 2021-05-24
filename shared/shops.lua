@@ -30,6 +30,18 @@ Config.Liquor = {
 	}
 }
 
+Config.FarmersMarket = {
+	name = 'Farmers Market',
+	blip = {
+		id = 88,
+		colour = 11,
+		scale = 0.6
+	}, inventory = {
+		{ name = 'tomato_seed', price = 2 },
+		{ name = 'corn_seed', price = 5 },
+	}
+}
+
 Config.Jail = {
 	name = 'Jail Store',
 	inventory = {
@@ -283,6 +295,8 @@ Config.Shops = {
 	{ type = Config.Liquor, coords = vector3(1166.024, 2708.930, 38.157), name = 'Rob\'s Liquor' },
 	{ type = Config.Liquor, coords = vector3(1392.562, 3604.684, 34.980), name = 'Rob\'s Liquor' },
 	{ type = Config.Liquor, coords = vector3(-1393.409, -606.624, 30.319), name = 'Rob\'s Liquor' },
+
+	{ type = Config.FarmersMarket, coords = vector3(1677.98, 4880.65, 42.05), name = 'Farmer\'s Market' },
 
 	{ type = Config.YouTool, coords = vector3(45.72, -1748.88, 29.65), name = 'YouTool' },
 	{ type = Config.YouTool, coords = vector3(2748.0, 3473.0, 55.67), name = 'YouTool' },
