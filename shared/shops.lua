@@ -13,6 +13,7 @@ Config.General = {
 		{ name = 'cola', price = 4 },
 		{ name = 'plastic_pouch', price = 3 },
 		{ name = 'bandage', price = 8 },
+		{ name = 'bakingsoda', price = 15},
 		
 	}
 }
