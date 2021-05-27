@@ -154,22 +154,6 @@ Config.SmokeOnTheWater = {
 	}
 }
 
-Config.StockMarket = {
-	blip = {
-		
-		id = 605,
-		colour = 69,
-		scale = 0.8
-		
-	}, inventory = {
-		{ name = 'BTC', price = 50870 },
-		{ name = 'SMP500', price = 4180 },
-		{ name = 'Tesla', price = 729 },
-		{ name = 'Amazon', price = 3340 },
-		{ name = 'SpaceX', price = 9001 },
-	}
-}
-
 Config.MirrorParkWeedShop = {
 	blip = {
 		id = 469,
@@ -310,7 +294,6 @@ Config.Shops = {
 	{ type = Config.Nail, coords = vector3(225.12, -1544.4, 29.29), name = 'Nail Salon' },  							-- the nail salon in the south side addon 
 	{ type = Config.SmokeOnTheWater, coords = vector3(-1172.3, -1571.92, 4.65), name = 'Smoke on the water' }, 			-- smoke on the water vespuchie beach  -- has bulk weed sales in back 
 	{ type = Config.MirrorParkWeedShop, coords = vector3(1175.25, -437.26, 66.90), name = 'Mirror Park dispensary' }, 	-- mirror park dispensary		-- has bulk weed sales in back 
-	{ type = Config.StockMarket, coords = vector3(232.18, -1095, 29.29), name = 'Stock Market' },						-- stock market shop 
 	{ type = Config.Burger, coords = vector3(-1193.19, -893.63, 13.9), name = 'Burger Shot' }, 							-- burger shot
 	{ type = Config.Hunting, coords = vector3(-774.18, 5602.75, 33.54), name = 'Hunting Shop' }, 						-- huning shop near paleto sells hunting rifles 
 	{ type = Config.Jail, coords = vector3(1793.98, 2483.11, -122.69), name = 'Prison Shop' }, 
