@@ -150,7 +150,7 @@ Config.SmokeOnTheWater = {
 		{ name = 'weed', price = 9 },
 		{ name = 'rolling_paper', price = 2 },
 		{ name = 'weed_pouch', price = 500 },
-		{ name = 'weed_seed', price = 35 },
+		
 	}
 }
 
@@ -163,7 +163,7 @@ Config.MirrorParkWeedShop = {
 		{ name = 'weed', price = 9 },
 		{ name = 'rolling_paper', price = 2 },
 		{ name = 'weed_pouch', price = 500 },
-		{ name = 'weed_seed', price = 35 },
+		
 	}
 }
 
