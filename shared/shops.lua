@@ -120,7 +120,6 @@ Config.Nail = {
 		colour = 69,
 		scale = 0.7
 	}, inventory = {
-		{ name = 'acetone', price = 75 },
 		{ name = 'hydrogen_peroxide450ml', price = 15 },
 	}
 }

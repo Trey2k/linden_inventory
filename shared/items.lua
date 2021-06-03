@@ -334,5 +334,10 @@ Config.ItemList = {
 		consume = 0,
 		event = 'weasel-plants:plantSeed'
 	},
+	['acacia_seed'] = {
+		useTime = 0,
+		consume = 0,
+		event = 'weasel-plants:plantSeed'
+	},
 }
 
