@@ -127,8 +127,19 @@ Config.ItemList = {
 		event = 'linden_inventory:burger'
 	},
 
-	['bread'] = {
+	['money_shot'] = {
 		hunger = 2000000,
+		animDict = 'mp_player_inteat@burger',
+		anim = 'mp_player_int_eat_burger_fp',
+		model = 'prop_cs_burger_01',
+		coords = { x = 0.02, y = 0.022, z = -0.02 },
+		rotation = { x = 0.0, y = 5.0, z = 0.0 },
+		useTime = 2500,
+		event = 'linden_inventory:moneyshot'
+	},
+
+	['bread'] = {
+		hunger = 500000,
 		animDict = 'mp_player_inteat@burger',
 		anim = 'mp_player_int_eat_burger_fp',
 		model = 'v_res_fa_bread01',
