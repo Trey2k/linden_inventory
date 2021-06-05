@@ -108,6 +108,7 @@ Config.YouTool = {
 		{ name = 'jackhammer', price = 500, metadata={type= '300'} },
 		{ name = 'jackhammer_mk2', price = 2000, metadata={type= '300'} },
 		{ name = 'WEAPON_HATCHET', price = 200 },
+		{ name = 'WEAPON_WRENCH', price = 30 },
 		
 
 		
