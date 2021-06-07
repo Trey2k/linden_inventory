@@ -7,7 +7,6 @@ end)
 AddEventHandler('linden_inventory:moneyshot', function()
 	TriggerEvent('mythic_notify:client:SendAlert', {type = 'inform', text = 'You ate a Money Shot burger', length = 2500})
 	SetPlayerMaxArmour(PlayerId(), 150)
-	print(GetPlayerMaxArmour(PlayerId()))
 end)
 
 AddEventHandler('linden_inventory:water', function()
@@ -85,9 +84,6 @@ Citizen.CreateThread(function()
 	info.vodka  = false
 	local timer = 0
 	while true do 
-		if IsControlPressed(0, 179) then
-			print(GetPlayerMaxArmour(PlayerId()))
-		end
 		Citizen.Wait(1000)
 		if info.whisky then
 			timer = timer + 100
