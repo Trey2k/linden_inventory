@@ -83,7 +83,7 @@ Citizen.CreateThread(function()
 	info.whisky = false
 	info.vodka  = false
 	local timer = 0
-	while true do
+	while true do 
 		Citizen.Wait(1000)
 		if info.whisky then
 			timer = timer + 100
