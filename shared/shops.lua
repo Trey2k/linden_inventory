@@ -107,12 +107,10 @@ Config.YouTool = {
 		{ name = 'matches', price = 8 },
 		{ name = 'tongs', price = 150 },
 		{ name = 'drain_cleaner', price = 20, metadata={type= '10% Hydrocloric Acid'} },
-		{ name = 'jackhammer', price = 500, metadata={type= '300'} },
-		{ name = 'jackhammer_mk2', price = 2000, metadata={type= '300'} },
+		{ name = 'jackhammer', price = 3750, metadata={type= '300'} },
+		{ name = 'jackhammer_mk2', price = 8990, metadata={type= '300'} },
 		{ name = 'WEAPON_HATCHET', price = 200 },
 		{ name = 'WEAPON_WRENCH', price = 30 },
-		
-
 		
 	}
 }
@@ -177,8 +175,7 @@ Config.Ammunation = {
 		scale = 0.8
 	}, inventory = {
 		{ name = 'ammo-9', price = 2, },
-		{ name = 'ammo-45', price = 4, },
-		{ name = 'ammo-rifle2', price = 6, },
+		{ name = 'gunpowder', price = 100, },
 		{ name = 'WEAPON_KNIFE', price = 200 },
 		{ name = 'WEAPON_BAT', price = 100 },
 		{ name = 'plate_steel', price = 50 },
