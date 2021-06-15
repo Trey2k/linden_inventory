@@ -150,6 +150,7 @@ Config.SmokeOnTheWater = {
 		{ name = 'weed', price = 9 },
 		{ name = 'rolling_paper', price = 2 },
 		{ name = 'weed_pouch', price = 500 },
+		{ name = 'metandienone', price = 3000 },
 		
 	}
 }
@@ -163,7 +164,7 @@ Config.MirrorParkWeedShop = {
 		{ name = 'weed', price = 9 },
 		{ name = 'rolling_paper', price = 2 },
 		{ name = 'weed_pouch', price = 500 },
-		
+		{ name = 'trenbolone', price = 5000 },
 	}
 }
 
@@ -218,7 +219,7 @@ Config.Medicine = {
 	}, inventory = {
 		{ name = 'medkit', price = 50 },
 		{ name = 'pseudoephedrine_pills_10mg', price = 20 },
-		{ name = 'metandienone', price = 2000 },
+		{ name = 'metandienone', price = 1000 },
 		{ name = 'bandage', price = 3 },
 		{ name = 'radio', price = 120 },
 		{ name = 'repairkit', price = 1000 },
