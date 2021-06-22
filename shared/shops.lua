@@ -107,10 +107,13 @@ Config.YouTool = {
 		{ name = 'matches', price = 8 },
 		{ name = 'tongs', price = 150 },
 		{ name = 'drain_cleaner', price = 20, metadata={type= '10% Hydrocloric Acid'} },
-		{ name = 'jackhammer', price = 3750, metadata={type= '300'} },
-		{ name = 'jackhammer_mk2', price = 8990, metadata={type= '300'} },
+		{ name = 'jackhammer', price = 3750, metadata={type= '300', durability = 100} },
+		{ name = 'jackhammer_mk2', price = 8990, metadata={type= '300', durability = 100} },
 		{ name = 'WEAPON_HATCHET', price = 200 },
 		{ name = 'WEAPON_WRENCH', price = 30 },
+		{ name = 'WEAPON_CROWBAR', price = 200 },
+		{ name = 'scuba_mask', price = 1000 },
+		{ name = 'diving_tank', price = 600 },
 		
 	}
 }

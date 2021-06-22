@@ -325,6 +325,18 @@ Config.ItemList = {
 		event = 'rp-radio:useRadio'
 	},
 
+	['scuba_mask'] = {
+		useTime = 1000,
+		consume = 0,
+		event = 'weasel-salvage:scubaMask'
+	},
+
+	['diving_tank'] = {
+		useTime = 1000,
+		consume = 0,
+		event = 'weasel-salvage:divingTank'
+	},
+
 	['weed_seed'] = {
 		useTime = 0,
 		consume = 0,
