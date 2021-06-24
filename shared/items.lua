@@ -283,6 +283,17 @@ Config.ItemList = {
 		event = 'linden_inventory:bandage'
 	},
 
+	['thermite_charge_iron'] = {
+		animDict = 'missheistdockssetup1clipboard@idle_a',
+		anim = 'idle_a',
+		flags = 49,
+		model = 'prop_rolled_sock_02',
+		coords = { x = -0.14, y = 0.02, z = -0.08 },
+		rotation = { x = -50.0, y = -50.0, z = 0.0 },
+		useTime = 2500,
+		event = 'linden_inventory:bandage'
+	},
+
 	['lockpick'] = {
 		useTime = 0,
 		consume = 0,
@@ -349,6 +360,16 @@ Config.ItemList = {
 		useTime = 0,
 		consume = 0,
 		event = 'weasel-plants:plantSeed'
+	},
+	['hunting_bait'] = {
+		useTime = 100,
+		consume = 0,
+		event = 'weasel-hunting:bait'
+	},
+	['washkit'] = {
+		useTime = 1000,
+		consume = 0,
+		event = 'weasel-courier:CleanCar'
 	},
 }
 

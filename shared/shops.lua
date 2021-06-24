@@ -87,6 +87,7 @@ Config.Hunting = {
 		colour = 69,
 		scale = 0.9
 	}, inventory = {
+		{ name = 'hunting_bait', price = 15, },
 		{ name = 'ammo-musket', price = 10, },
 		{ name = 'WEAPON_KNIFE', price = 150 },
 		{ name = 'WEAPON_HATCHET', price = 200 },
@@ -103,6 +104,7 @@ Config.YouTool = {
 	}, inventory = {
 		{ name = 'lockpick', price = 40 },
 		{ name = 'repairkit', price = 1500 },
+		{ name = 'washkit', price = 30 },
 		{ name = 'radio', price = 150 },
 		{ name = 'matches', price = 8 },
 		{ name = 'tongs', price = 150 },
