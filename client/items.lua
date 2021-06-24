@@ -76,6 +76,7 @@ AddEventHandler('linden_inventory:armour', function()
 	SetPlayerMaxArmour(playerID, 100)
 	SetPedArmour(playerPed, 100)
 end)
+
 Citizen.CreateThread(function()
 	RequestAnimSet("MOVE_M@DRUNK@VERYDRUNK")
 	RequestAnimSet("MOVE_M@DRUNK@MODERATEDRUNK")
