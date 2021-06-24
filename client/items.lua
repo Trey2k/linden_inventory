@@ -6,7 +6,11 @@ end)
 
 AddEventHandler('linden_inventory:moneyshot', function()
 	TriggerEvent('mythic_notify:client:SendAlert', {type = 'inform', text = 'You ate a Money Shot burger', length = 2500})
-	SetPlayerMaxArmour(PlayerId(), 150)
+	SetPlayerMaxArmour(playerPed, 150)
+	local maxHealth = 200
+	local health = GetEntityHealth(playerPed)
+	local newHealth = math.min(maxHealth, math.floor(health + maxHealth / 12))
+	SetEntityHealth(playerPed, newHealth)
 end)
 
 AddEventHandler('linden_inventory:water', function()
