@@ -383,5 +383,10 @@ Config.ItemList = {
 		consume = 0,
 		event = 'weasel-courier:CleanCar'
 	},
+	['fishingrod'] = {
+		useTime = 1000,
+		consume = 0,
+		event = 'weasel-fishing:useFishingRod'
+	},
 }
 

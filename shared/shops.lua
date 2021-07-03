@@ -121,6 +121,7 @@ Config.YouTool = {
 }
 
 Config.Nail = {
+	name = 'Nail Salon',
 	blip = {
 		id = 121,
 		colour = 69,
@@ -130,7 +131,20 @@ Config.Nail = {
 	}
 }
 
+Config.MasterBaiter = {
+	name = 'Master Baiter',
+	blip = {
+		id = 68,
+		colour = 22,
+		scale = 0.7
+	}, inventory = {
+		{ name = 'fishingrod', price = 200 },
+		{ name = 'bait', price = 40 },
+	}
+}
+
 Config.DollaPills = {
+	name = 'Dolla Pills',
 	blip = {
 		id = 51,
 		colour = 48,
@@ -287,13 +301,11 @@ Config.Shops = {
 	{ type = Config.Liquor, coords = vector3(1392.562, 3604.684, 34.980), name = 'Rob\'s Liquor' },
 	{ type = Config.Liquor, coords = vector3(-1393.409, -606.624, 30.319), name = 'Rob\'s Liquor' },
 
-	{ type = Config.FarmersMarket, coords = vector3(1677.98, 4880.65, 42.05), name = 'Farmer\'s Market' },
 
 	{ type = Config.YouTool, coords = vector3(45.72, -1748.88, 29.65), name = 'YouTool' },
 	{ type = Config.YouTool, coords = vector3(2748.0, 3473.0, 55.67), name = 'YouTool' },
 	{ type = Config.YouTool, coords = vector3(342.99, -1298.26, 32.51), name = 'YouTool' }, 
 
-	{ type = Config.VU, coords = vector3(127.85, -1284.68, 29.28), name = 'Vanilla Unicorn Bar' },
 
 	---------------------------- OUR SHOPS ADDED ------------------------------------------------------
 
@@ -301,7 +313,10 @@ Config.Shops = {
 	{ type = Config.SmokeOnTheWater, coords = vector3(-1172.3, -1571.92, 4.65), name = 'Smoke on the water' }, 			-- smoke on the water vespuchie beach  -- has bulk weed sales in back 
 	{ type = Config.MirrorParkWeedShop, coords = vector3(1175.25, -437.26, 66.90), name = 'Mirror Park dispensary' }, 	-- mirror park dispensary		-- has bulk weed sales in back 
 	{ type = Config.Hunting, coords = vector3(-774.18, 5602.75, 33.54), name = 'Hunting Shop' }, 						-- huning shop near paleto sells hunting rifles 
-	{ type = Config.Jail, coords = vector3(1793.98, 2483.11, -122.69), name = 'Prison Shop' }, 
+	{ type = Config.Jail, coords = vector3(1793.98, 2483.11, -122.69), name = 'Prison Shop' },
+	{ type = Config.VU, coords = vector3(127.85, -1284.68, 29.28), name = 'Vanilla Unicorn Bar' },
+	{ type = Config.FarmersMarket, coords = vector3(1677.98, 4880.65, 42.05), name = 'Farmer\'s Market' },
+	{ type = Config.MasterBaiter, coords = vector3(-1820.18, -1220.53, 13.02), name = 'Master Baiter' },
 
 	---- dolla pills
 
