@@ -284,14 +284,9 @@ Config.ItemList = {
 	},
 
 	['thermite_charge_iron'] = {
-		animDict = 'missheistdockssetup1clipboard@idle_a',
-		anim = 'idle_a',
-		flags = 49,
-		model = 'prop_rolled_sock_02',
-		coords = { x = -0.14, y = 0.02, z = -0.08 },
-		rotation = { x = -50.0, y = -50.0, z = 0.0 },
-		useTime = 2500,
-		event = 'linden_inventory:bandage'
+		useTime = 0,
+		consume = 0,
+		dofirst = 'weasel-banktruck:TruckRob'
 	},
 
 	['lockpick'] = {
