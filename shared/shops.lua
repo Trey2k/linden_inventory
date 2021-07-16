@@ -143,8 +143,8 @@ Config.MasterBaiter = {
 	}
 }
 
-Config.DollaPills = {
-	name = 'Dolla Pills',
+Config.DollerPills = {
+	name = 'Doller Pills',
 	blip = {
 		id = 51,
 		colour = 48,
@@ -194,8 +194,8 @@ Config.Ammunation = {
 		colour = 69,
 		scale = 0.8
 	}, inventory = {
-		{ name = 'ammo-9', price = 2, },
-		{ name = 'gunpowder', price = 100, },
+		{ name = 'ammo-9', price = 2 },
+		{ name = 'gunpowder', price = 40 },
 		{ name = 'WEAPON_KNIFE', price = 200 },
 		{ name = 'WEAPON_BAT', price = 100 },
 		{ name = 'plate_steel', price = 50 },
@@ -320,9 +320,9 @@ Config.Shops = {
 
 	---- dolla pills
 
-	{ type = Config.DollaPills, coords = vector3(68.72, -1569.75, 29.5), name = 'Dolla Pills' },            			-- dolla pills
-	{ type = Config.DollaPills, coords = vector3(591.23, 2743.9, 42.04), name = 'Dolla Pills' },						-- dolla pills
-	{ type = Config.DollaPills, coords = vector3(98.42, -225.3, 54.64), name = 'Dolla Pills' },							-- dolla pills
+	{ type = Config.DollerPills, coords = vector3(68.72, -1569.75, 29.5), name = 'Dolla Pills' },            			-- dolla pills
+	{ type = Config.DollerPills, coords = vector3(591.23, 2743.9, 42.04), name = 'Dolla Pills' },						-- dolla pills
+	{ type = Config.DollerPills, coords = vector3(98.42, -225.3, 54.64), name = 'Dolla Pills' },							-- dolla pills
 	
 
 
