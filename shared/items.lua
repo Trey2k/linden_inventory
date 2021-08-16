@@ -348,40 +348,53 @@ Config.ItemList = {
 		consume = 0,
 		event = 'weasel-plants:plantSeed'
 	},
+
 	['coke_seed'] = {
 		useTime = 0,
 		consume = 0,
 		event = 'weasel-plants:plantSeed'
 	},
+
 	['corn_seed'] = {
 		useTime = 0,
 		consume = 0,
 		event = 'weasel-plants:plantSeed'
 	},
+
 	['tomato_seed'] = {
 		useTime = 0,
 		consume = 0,
 		event = 'weasel-plants:plantSeed'
 	},
+
 	['acacia_seed'] = {
 		useTime = 0,
 		consume = 0,
 		event = 'weasel-plants:plantSeed'
 	},
+
+	['poppy_seed'] = {
+		useTime = 0,
+		consume = 0,
+		event = 'weasel-plants:plantSeed'
+	},
+
 	['hunting_bait'] = {
 		useTime = 100,
 		consume = 0,
 		event = 'weasel-hunting:bait'
 	},
+
 	['washkit'] = {
 		useTime = 1000,
 		consume = 0,
 		event = 'weasel-courier:CleanCar'
 	},
+	
 	['fishingrod'] = {
 		useTime = 1000,
 		consume = 0,
 		event = 'weasel-fishing:useFishingRod'
-	},
+	}
 }
 
