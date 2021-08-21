@@ -283,6 +283,17 @@ Config.ItemList = {
 		event = 'linden_inventory:bandage'
 	},
 
+	['firstaidkit'] = {
+		animDict = 'missheistdockssetup1clipboard@idle_a',
+		anim = 'idle_a',
+		flags = 49,
+		model = 'prop_rolled_sock_02',
+		coords = { x = -0.14, y = 0.02, z = -0.08 },
+		rotation = { x = -50.0, y = -50.0, z = 0.0 },
+		useTime = 6000,
+		event = 'linden_inventory:firstaidkit'
+	},
+
 	['thermite_charge_iron'] = {
 		useTime = 0,
 		consume = 0,
@@ -348,50 +359,53 @@ Config.ItemList = {
 		consume = 0,
 		event = 'weasel-plants:plantSeed'
 	},
+
 	['coke_seed'] = {
 		useTime = 0,
 		consume = 0,
 		event = 'weasel-plants:plantSeed'
 	},
+
 	['corn_seed'] = {
 		useTime = 0,
 		consume = 0,
 		event = 'weasel-plants:plantSeed'
 	},
+
 	['tomato_seed'] = {
 		useTime = 0,
 		consume = 0,
 		event = 'weasel-plants:plantSeed'
 	},
+
 	['acacia_seed'] = {
 		useTime = 0,
 		consume = 0,
 		event = 'weasel-plants:plantSeed'
 	},
+
+	['poppy_seed'] = {
+		useTime = 0,
+		consume = 0,
+		event = 'weasel-plants:plantSeed'
+	},
+
 	['hunting_bait'] = {
 		useTime = 100,
 		consume = 0,
 		event = 'weasel-hunting:bait'
 	},
+
 	['washkit'] = {
 		useTime = 1000,
 		consume = 0,
 		event = 'weasel-courier:CleanCar'
 	},
+	
 	['fishingrod'] = {
 		useTime = 1000,
 		consume = 0,
 		event = 'weasel-fishing:useFishingRod'
-	},
-	['jackhammer'] = {
-		animDict = "amb@world_human_const_drill@male@drill@base",
-		anim = 'base',
-		flags = 49,
-		model = 'prop_tool_jackham',
-		coords = { x = 0.15, y = 0.25, z = -0.0 },
-        rotation = { x = 90.0, y = 15.0, z = 260.0 },
-		useTime = 2500,
-		event = 'weasel-mining:Jackhammer'
 	}
 }
 
