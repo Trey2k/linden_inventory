@@ -987,3 +987,8 @@ AddEventHandler('linden_inventory:useItem',function(item)
 		end
 	end
 end)
+
+RegisterNetEvent("linden_inventory:userInventory")
+AddEventHandler("linden_inventory:userInventory", function()
+	ExecuteCommand("inv")
+end)
