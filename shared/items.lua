@@ -383,5 +383,15 @@ Config.ItemList = {
 		consume = 0,
 		event = 'weasel-fishing:useFishingRod'
 	},
+	['jackhammer'] = {
+		animDict = "amb@world_human_const_drill@male@drill@base",
+		anim = 'base',
+		flags = 49,
+		model = 'prop_tool_jackham',
+		coords = { x = 0.15, y = 0.25, z = -0.0 },
+        rotation = { x = 90.0, y = 15.0, z = 260.0 },
+		useTime = 2500,
+		event = 'weasel-mining:Jackhammer'
+	}
 }
 
