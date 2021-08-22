@@ -992,3 +992,13 @@ RegisterNetEvent("linden_inventory:userInventory")
 AddEventHandler("linden_inventory:userInventory", function()
 	ExecuteCommand("inv")
 end)
+
+RegisterNetEvent("linden_inventory:gloveBox")
+AddEventHandler("linden_inventory:gloveBox", function()
+	ExecuteCommand("vehinv")
+end)
+
+RegisterNetEvent("linden_inventory:steal")
+AddEventHandler("linden_inventory:steal", function()
+	ExecuteCommand("steal")
+end)
