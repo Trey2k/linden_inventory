@@ -7,14 +7,42 @@ Config.General = {
 	}, inventory = {
 		{ name = 'burger', price = 5 },
 		{ name = 'hotdog', price = 5 },
-		{ name = 'bread', price = 4 },
-		{ name = 'cheese', price = 5 },
 		{ name = 'water', price = 3 },
 		{ name = 'cola', price = 4 },
 		{ name = 'plastic_pouch', price = 3 },
 		{ name = 'bandage', price = 8 },
 		{ name = 'bakingsoda', price = 15},
 		
+	}
+}
+
+Config.Grocery = {
+	name = 'Grocery Store',
+	blip = {
+		id = 52,
+		colour = 68,
+		scale = 0.6
+	}, inventory = {
+		{ name = 'tomato', price = 5 },
+		{ name = 'corn', price = 8 },
+		{ name = 'flour', price = 5 },
+		{ name = 'cheese', price = 5 },
+		{ name = 'bread', price = 4 },
+		{ name = 'ground_meat', price = 3 },
+		{ name = 'lettuce', price = 2},
+		{ name = 'jalapeno', price = 2 },
+		{ name = 'potato', price = 3 },
+		{ name = 'onion', price = 3 },
+		{ name = 'cilantro', price = 2},
+		{ name = 'cinnamon', price = 2},
+		{ name = 'sugar', price = 5},
+		{ name = 'coffee_bag', price = 6},
+		{ name = 'water', price = 3},
+		{ name = 'cola', price = 4},
+		{ name = 'jarritos_mango', price = 2},
+		{ name = 'jarritos_pineapple', price = 2},
+		{ name = 'beer', price = 8 },
+		{ name = 'bakingsoda', price = 15},
 	}
 }
 
@@ -42,6 +70,12 @@ Config.FarmersMarket = {
 		{ name = 'tomato', price = 3 },
 		{ name = 'corn_seed', price = 5 },
 		{ name = 'corn', price = 6 },
+		{ name = 'lettuce', price = 1},
+		{ name = 'jalapeno', price = 1 },
+		{ name = 'potato', price = 2 },
+		{ name = 'onion', price = 2 },
+		{ name = 'cilantro', price = 1},
+		{ name = 'cinnamon', price = 1},
 	}
 }
 
@@ -73,7 +107,7 @@ Config.Burger = {
 	blip = {
 		id = 304,
 		colour = 69,
-		scale = 0.9
+		scale = 0.6
 	}, inventory = {
 		{ name = 'burger', price = 10 },
 		{ name = 'water', price = 10 },
@@ -85,7 +119,7 @@ Config.Hunting = {
 	blip = {
 		id = 119,
 		colour = 69,
-		scale = 0.9
+		scale = 0.6
 	}, inventory = {
 		{ name = 'hunting_bait', price = 15, },
 		{ name = 'ammo-musket', price = 10, },
@@ -100,7 +134,7 @@ Config.YouTool = {
 	blip = {
 		id = 402,
 		colour = 69,
-		scale = 0.9
+		scale = 0.6
 	}, inventory = {
 		{ name = 'lockpick', price = 40 },
 		{ name = 'repairkit', price = 1500 },
@@ -125,7 +159,7 @@ Config.Nail = {
 	blip = {
 		id = 121,
 		colour = 69,
-		scale = 0.7
+		scale = 0.6
 	}, inventory = {
 		{ name = 'hydrogen_peroxide450ml', price = 15 },
 	}
@@ -136,7 +170,7 @@ Config.MasterBaiter = {
 	blip = {
 		id = 68,
 		colour = 22,
-		scale = 0.7
+		scale = 0.6
 	}, inventory = {
 		{ name = 'fishingrod', price = 200 },
 		{ name = 'bait', price = 40 },
@@ -148,7 +182,7 @@ Config.DollerPills = {
 	blip = {
 		id = 51,
 		colour = 48,
-		scale = 0.7
+		scale = 0.6
 	}, inventory = {
 		{ name = 'acetone', price = 75 },
 		{ name = 'pseudoephedrine_pills_10mg', price = 75 },
@@ -178,7 +212,7 @@ Config.MirrorParkWeedShop = {
 	blip = {
 		id = 469,
 		colour = 69,
-		scale = 0.9
+		scale = 0.6
 	}, inventory = {
 		{ name = 'weed', price = 9 },
 		{ name = 'rolling_paper', price = 2 },
@@ -192,7 +226,7 @@ Config.Ammunation = {
 	blip = {
 		id = 110,
 		colour = 69,
-		scale = 0.8
+		scale = 0.6
 	}, inventory = {
 		{ name = 'ammo-9', price = 2 },
 		{ name = 'gunpowder', price = 40 },
@@ -211,7 +245,7 @@ Config.PoliceArmoury = {
 	blip = {
 		id = 110,
 		colour = 84,
-		scale = 0.8
+		scale = 0.6
 	}, inventory = {
 		{ name = 'ammo-9', price = 5, },
 		{ name = 'ammo-rifle', price = 5, },
@@ -234,7 +268,7 @@ Config.Medicine = {
 	blip = {
 		id = 403,
 		colour = 69,
-		scale = 0.8
+		scale = 0.6
 	}, inventory = {
 		{ name = 'medkit', price = 50 },
 		{ name = 'pseudoephedrine_pills_10mg', price = 20 },
@@ -323,6 +357,13 @@ Config.Shops = {
 	{ type = Config.DollerPills, coords = vector3(68.72, -1569.75, 29.5), name = 'Dolla Pills' },            			-- dolla pills
 	{ type = Config.DollerPills, coords = vector3(591.23, 2743.9, 42.04), name = 'Dolla Pills' },						-- dolla pills
 	{ type = Config.DollerPills, coords = vector3(98.42, -225.3, 54.64), name = 'Dolla Pills' },							-- dolla pills
+
+	{ type = Config.Grocery, coords = vector3(53.13, -1478.85, 29.29), name = 'Grocery Store' },
+	{ type = Config.Grocery, coords = vector3(84.53, -1404.83, 29.15), name = 'Grocery Store' },
+	{ type = Config.Grocery, coords = vector3(-1316.14, -383.66, 36.67), name = 'Grocery Store' },
+	{ type = Config.Grocery, coords = vector3(410.44, -1910.85, 25.45), name = 'Grocery Store' },
+	{ type = Config.Grocery, coords = vector3(1707.84, 4792.24, 41.98), name = 'Grocery Store' },
+	{ type = Config.Grocery, coords = vector3(1168.99, -291.62, 69.02), name = 'Grocery Store' },
 	
 
 

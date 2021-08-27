@@ -171,6 +171,17 @@ Config.ItemList = {
 		event = 'linden_inventory:cola'
 	},
 
+	['coffee'] = {
+		thirst = 2000000,
+		animDict = 'mp_player_intdrink',
+		anim = 'loop_bottle',
+		model = 'prop_ld_flow_bottle',
+		coords = { x = 0.03, y = 0.0, z = 0.02 },
+		rotation = { x = 0.0, y = -13.5, z = -1.5 },
+		useTime = 2500,
+		event = 'linden_inventory:coffee'
+	},
+
 	['whisky'] = {
 		thirst = 2000,
 		animDict = 'mp_player_intdrink',
@@ -202,6 +213,28 @@ Config.ItemList = {
 		rotation = { x = 0.0, y = -13.5, z = -1.5 },
 		useTime = 3000,
 		event = 'linden_inventory:beer'
+	},
+
+	['jarritos_mango'] = {
+		thirst = 2000000,
+		animDict = 'mp_player_intdrink',
+		anim = 'loop_bottle',
+		model = 'prop_beer_bottle',
+		coords = { x = 0.03, y = 0.0, z = -0.16 },
+		rotation = { x = 0.0, y = -13.5, z = -1.5 },
+		useTime = 3000,
+		event = 'linden_inventory:jarritos_mango'
+	},
+
+	['jarritos_pineapple'] = {
+		thirst = 2000000,
+		animDict = 'mp_player_intdrink',
+		anim = 'loop_bottle',
+		model = 'prop_beer_bottle',
+		coords = { x = 0.03, y = 0.0, z = -0.16 },
+		rotation = { x = 0.0, y = -13.5, z = -1.5 },
+		useTime = 3000,
+		event = 'linden_inventory:jarritos_pineapple'
 	},
 
 	['margarita'] = {
@@ -271,6 +304,60 @@ Config.ItemList = {
 		event = 'linden_inventory:cheese'
 	},
 
+	['taco'] = {
+		hunger = 2000000,
+		animDict = 'mp_player_inteat@burger',
+		anim = 'mp_player_int_eat_burger_fp',
+		model = '',
+		coords = { x = 0.01, y = 0.0, z = -0.07 },
+		rotation = { x = 1.0, y = 0.0, z = 0.5 },
+		useTime = 2500,
+		event = 'linden_inventory:taco'
+	},
+
+	['burrito'] = {
+		hunger = 2000000,
+		animDict = 'mp_player_inteat@burger',
+		anim = 'mp_player_int_eat_burger_fp',
+		model = '',
+		coords = { x = 0.01, y = 0.0, z = -0.07 },
+		rotation = { x = 1.0, y = 0.0, z = 0.5 },
+		useTime = 2500,
+		event = 'linden_inventory:burrito'
+	},
+
+	['quesadilla'] = {
+		hunger = 2000000,
+		animDict = 'mp_player_inteat@burger',
+		anim = 'mp_player_int_eat_burger_fp',
+		model = '',
+		coords = { x = 0.01, y = 0.0, z = -0.07 },
+		rotation = { x = 1.0, y = 0.0, z = 0.5 },
+		useTime = 2500,
+		event = 'linden_inventory:quesadilla'
+	},
+
+	['tamale'] = {
+		hunger = 500000,
+		animDict = 'mp_player_inteat@burger',
+		anim = 'mp_player_int_eat_burger_fp',
+		model = '',
+		coords = { x = 0.01, y = 0.0, z = -0.07 },
+		rotation = { x = 1.0, y = 0.0, z = 0.5 },
+		useTime = 2500,
+		event = 'linden_inventory:tamale'
+	},
+
+	['elote'] = {
+		hunger = 500000,
+		animDict = 'mp_player_inteat@burger',
+		anim = 'mp_player_int_eat_burger_fp',
+		model = '',
+		coords = { x = 0.01, y = 0.0, z = -0.07 },
+		rotation = { x = 1.0, y = 0.0, z = 0.5 },
+		useTime = 2500,
+		event = 'linden_inventory:elote'
+	},
 
 	['bandage'] = {
 		animDict = 'missheistdockssetup1clipboard@idle_a',

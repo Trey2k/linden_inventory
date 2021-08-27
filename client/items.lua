@@ -21,6 +21,18 @@ AddEventHandler('linden_inventory:cola', function()
 	TriggerEvent('mythic_notify:client:SendAlert', {type = 'inform', text = 'You drank some delicious eCola', length = 2500})
 end)
 
+AddEventHandler('linden_inventory:coffee', function()
+	TriggerEvent('mythic_notify:client:SendAlert', {type = 'inform', text = 'You drank a coffee', length = 2500})
+end)
+
+AddEventHandler('linden_inventory:jarritos_mango', function()
+	TriggerEvent('mythic_notify:client:SendAlert', {type = 'inform', text = 'You drank a mango jarritos', length = 2500})
+end)
+
+AddEventHandler('linden_inventory:jarritos_pineapple', function()
+	TriggerEvent('mythic_notify:client:SendAlert', {type = 'inform', text = 'You drank a pineapple jarritos', length = 2500})
+end)
+
 AddEventHandler('linden_inventory:mustard', function()
 	TriggerEvent('mythic_notify:client:SendAlert', {type = 'inform', text = 'You.. drank mustard', length = 2500})
 end)
@@ -43,6 +55,26 @@ end)
 
 AddEventHandler('linden_inventory:cheese', function()
 	TriggerEvent('mythic_notify:client:SendAlert', {type = 'inform', text = 'You.. ate a slice of cheese', length = 2500})
+end)
+
+AddEventHandler('linden_inventory:taco', function()
+	TriggerEvent('mythic_notify:client:SendAlert', {type = 'inform', text = 'You.. ate a taco', length = 2500})
+end)
+
+AddEventHandler('linden_inventory:burrito', function()
+	TriggerEvent('mythic_notify:client:SendAlert', {type = 'inform', text = 'You.. ate a burrito', length = 2500})
+end)
+
+AddEventHandler('linden_inventory:quesadilla', function()
+	TriggerEvent('mythic_notify:client:SendAlert', {type = 'inform', text = 'You.. ate a quesadilla', length = 2500})
+end)
+
+AddEventHandler('linden_inventory:elote', function()
+	TriggerEvent('mythic_notify:client:SendAlert', {type = 'inform', text = 'You.. ate an elote. Yum!', length = 2500})
+end)
+
+AddEventHandler('linden_inventory:tamale', function()
+	TriggerEvent('mythic_notify:client:SendAlert', {type = 'inform', text = 'You.. ate a tamale', length = 2500})
 end)
 
 AddEventHandler('linden_inventory:whisky', function()
